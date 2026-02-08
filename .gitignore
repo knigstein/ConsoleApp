@@ -1,0 +1,14 @@
+# IntelliJ
+.idea/
+*.iml
+
+# Maven/Gradle
+target/
+build/
+
+# Compiled files
+out/
+*.class
+
+# Logs
+*.log
