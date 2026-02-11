@@ -39,6 +39,6 @@ public class PrintFieldDescendingGroupAdminCommand implements Command {
      */
     @Override
     public String getDescription() {
-        return "вывести groupAdmin в порядке убывания";
+        return "Вывести groupAdmin в порядке убывания";
     }
 }

@@ -49,6 +49,6 @@ public class SaveCommand implements Command {
      */
     @Override
     public String getDescription() {
-        return "сохранить коллекцию в файл";
+        return "Сохранить коллекцию в файл";
     }
 }

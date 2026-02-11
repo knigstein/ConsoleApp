@@ -56,9 +56,9 @@ public class AddIfMinCommand implements Command, ScriptAware {
         boolean added = collectionManager.addIfMin(group);
 
         if (added) {
-            System.out.println("Элемент добавлен (он меньше минимального).");
+            System.out.println("Элемент добавлен (он меньше минимального)");
         } else {
-            System.out.println("Элемент не добавлен (он не меньше минимального).");
+            System.out.println("Элемент не добавлен (он не меньше минимального)");
         }
     }
 
@@ -69,6 +69,6 @@ public class AddIfMinCommand implements Command, ScriptAware {
      */
     @Override
     public String getDescription() {
-        return "добавить элемент, если он меньше минимального";
+        return "Добавление нового элемента, если он меньше минимального";
     }
 }

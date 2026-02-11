@@ -45,6 +45,6 @@ public class FilterContainsNameCommand implements Command {
      */
     @Override
     public String getDescription() {
-        return "вывести элементы, имя которых содержит подстроку";
+        return "Вывести элементы, имя которых содержит подстроку";
     }
 }

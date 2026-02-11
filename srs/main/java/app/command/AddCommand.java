@@ -56,7 +56,7 @@ public class AddCommand implements Command, ScriptAware {
 
         collectionManager.add(group);
 
-        System.out.println("Элемент добавлен.");
+        System.out.println("Элемент добавлен");
     }
 
     /**
@@ -66,6 +66,6 @@ public class AddCommand implements Command, ScriptAware {
      */
     @Override
     public String getDescription() {
-        return "добавить новый элемент в коллекцию";
+        return "Добавление нового элемента в коллекцию";
     }
 }

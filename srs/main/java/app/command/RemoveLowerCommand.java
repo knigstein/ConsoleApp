@@ -66,6 +66,6 @@ public class RemoveLowerCommand implements Command, ScriptAware {
      */
     @Override
     public String getDescription() {
-        return "удалить элементы меньше заданного";
+        return "Удалывить элементы меньше заданного";
     }
 }

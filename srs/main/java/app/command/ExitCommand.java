@@ -27,6 +27,6 @@ public class ExitCommand implements Command {
      */
     @Override
     public String getDescription() {
-        return "завершить программу";
+        return "Завершить программу";
     }
 }

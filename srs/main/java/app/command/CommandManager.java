@@ -47,7 +47,7 @@ public class CommandManager {
         Command command = commands.get(commandName);
 
         if (command == null) {
-            System.out.println("Неизвестная команда. Введите help.");
+            System.out.println("Неизвестная команда. Введите help");
             return true;
         }
 

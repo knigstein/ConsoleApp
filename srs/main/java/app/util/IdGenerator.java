@@ -8,7 +8,7 @@ package util;
  * Класс представляет собой утилиту с набором статических методов.
  */
 public class IdGenerator {
-  
+
     public static int currentId = 1;
 
     /**

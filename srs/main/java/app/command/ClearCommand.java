@@ -29,7 +29,7 @@ public class ClearCommand implements Command {
     @Override
     public void execute(String[] args) {
         collectionManager.clear();
-        System.out.println("Коллекция очищена.");
+        System.out.println("Коллекция очищена");
     }
 
     /**
@@ -39,6 +39,6 @@ public class ClearCommand implements Command {
      */
     @Override
     public String getDescription() {
-        return "очистить коллекцию";
+        return "Очищение коллекции";
     }
 }

@@ -34,7 +34,7 @@ public class FilterGreaterThanSemesterCommand implements Command {
     public void execute(String[] args) {
 
         if (args.length < 2) {
-            System.out.println("Не указан семестр.");
+            System.out.println("Не указан семестр");
             return;
         }
 
@@ -42,7 +42,7 @@ public class FilterGreaterThanSemesterCommand implements Command {
             Semester semester = Semester.valueOf(args[1]);
             collectionManager.filterGreaterThanSemester(semester);
         } catch (Exception e) {
-            System.out.println("Некорректный семестр.");
+            System.out.println("Некорректный семестр");
         }
     }
 
@@ -53,6 +53,6 @@ public class FilterGreaterThanSemesterCommand implements Command {
      */
     @Override
     public String getDescription() {
-        return "вывести элементы с semesterEnum больше заданного";
+        return "Вывести элементы с semesterEnum больше заданного";
     }
 }

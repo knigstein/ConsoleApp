@@ -34,7 +34,7 @@ public class RemoveFirstCommand implements Command {
         StudyGroup removed = collectionManager.removeFirst();
 
         if (removed == null) {
-            System.out.println("Коллекция пуста.");
+            System.out.println("Коллекция пуста");
         } else {
             System.out.println("Удалён элемент: " + removed);
         }
@@ -47,6 +47,6 @@ public class RemoveFirstCommand implements Command {
      */
     @Override
     public String getDescription() {
-        return "удалить первый элемент коллекции";
+        return "Удалить первый элемент коллекции";
     }
 }

@@ -10,7 +10,7 @@ package model;
 public class Coordinates {
 
     private int x;
-    private Double y; // не null
+    private Double y;
 
     /**
      * Создаёт объект координат с указанными значениями.

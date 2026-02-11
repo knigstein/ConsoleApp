@@ -11,10 +11,10 @@ import java.util.Date;
  * объектов {@link StudyGroup}.
  */
 public class Person {
-    private String name; //Поле не может быть null, Строка не может быть пустой
-    private Date birthday; //Поле не может быть null
-    private Color eyeColor; //Поле может быть null
-    private Country nationality; //Поле может быть null
+    private String name;
+    private Date birthday;
+    private Color eyeColor;
+    private Country nationality;
 
     /**
      * Создаёт новый объект администратора группы с указанными параметрами.

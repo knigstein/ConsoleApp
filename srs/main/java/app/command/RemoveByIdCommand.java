@@ -31,7 +31,7 @@ public class RemoveByIdCommand implements Command {
     public void execute(String[] args) {
 
         if (args.length < 2) {
-            System.out.println("Не указан id.");
+            System.out.println("Не указан id");
             return;
         }
 
@@ -41,13 +41,13 @@ public class RemoveByIdCommand implements Command {
             boolean removed = collectionManager.removeById(id);
 
             if (removed) {
-                System.out.println("Элемент удалён.");
+                System.out.println("Элемент удалён");
             } else {
-                System.out.println("Элемент с таким id не найден.");
+                System.out.println("Элемент с таким id не найден");
             }
 
         } catch (NumberFormatException e) {
-            System.out.println("id должен быть числом.");
+            System.out.println("id должен быть числом");
         }
     }
 

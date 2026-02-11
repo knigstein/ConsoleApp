@@ -39,14 +39,14 @@ public class ExecuteScriptCommand implements Command {
     public void execute(String[] args) {
 
         if (args.length < 2) {
-            System.out.println("Не указано имя файла.");
+            System.out.println("Не указано имя файла");
             return;
         }
 
         String fileName = args[1];
 
         if (executingScripts.contains(fileName)) {
-            System.out.println("Обнаружена рекурсия! Скрипт уже выполняется.");
+            System.out.println("Обнаружена рекурсия! Скрипт уже выполняется");
             return;
         }
 
@@ -63,7 +63,7 @@ public class ExecuteScriptCommand implements Command {
             executingScripts.remove(fileName);
 
         } catch (FileNotFoundException e) {
-            System.out.println("Файл не найден.");
+            System.out.println("Файл не найден");
         }
     }
 
@@ -74,6 +74,6 @@ public class ExecuteScriptCommand implements Command {
      */
     @Override
     public String getDescription() {
-        return "выполнить команды из файла";
+        return "Выполнить команды из файла";
     }
 }
