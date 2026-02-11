@@ -5,8 +5,22 @@ import io.FileManager;
 
 import java.util.Scanner;
 
+/**
+ * Точка входа в консольное приложение для управления коллекцией учебных групп.
+ * Инициализирует менеджер коллекции, загружает данные из файла, регистрирует команды
+ * и запускает интерактивный цикл обработки пользовательского ввода.
+ *
+ * Класс использует инфраструктуру команд из пакета {@code command} и классы
+ * {@link collection.CollectionManager}, {@link FileManager} и {@link ConsoleManager}.
+ */
 public class Main {
 
+    /**
+     * Точка входа в программу.
+     * Ожидает, что в аргументах командной строки будет передано имя файла для загрузки и сохранения коллекции.
+     *
+     * @param args аргументы командной строки, где {@code args[0]} — имя XML-файла с данными
+     */
     public static void main(String[] args) {
 
         if (args.length == 0) {
@@ -19,7 +33,6 @@ public class Main {
         CollectionManager collectionManager = new CollectionManager();
         FileManager fileManager = new FileManager(fileName);
 
-        // Загрузка данных
         try {
             collectionManager.getCollection().addAll(fileManager.load());
         } catch (Exception e) {

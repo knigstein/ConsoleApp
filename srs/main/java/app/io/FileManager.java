@@ -15,17 +15,32 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.xml.sax.InputSource;
 
 /**
- * Класс для работы с файлом (чтение/запись XML).
+ * Класс для работы с файлом, содержащим коллекцию объектов {@link model.StudyGroup} в формате XML.
+ * Отвечает за загрузку коллекции из файла и сохранение текущего состояния коллекции в файл.
+ *
+ * При загрузке коллекции обновляет генератор идентификаторов {@link util.IdGenerator},
+ * чтобы обеспечить уникальность создаваемых в дальнейшем объектов.
  */
-
 public class FileManager {
 
     private final String filename;
 
+    /**
+     * Создаёт менеджер для работы с указанным файлом.
+     *
+     * @param filename путь к файлу, используемому для чтения и записи коллекции
+     */
     public FileManager(String filename) {
         this.filename = filename;
     }
 
+    /**
+     * Загружает коллекцию объектов {@link StudyGroup} из XML-файла.
+     * При отсутствии файла создаётся пустая коллекция.
+     *
+     * @return приоритетная очередь с загруженными объектами {@link StudyGroup};
+     *         если файл отсутствует или произошла ошибка, возвращается пустая коллекция
+     */
     public PriorityQueue<StudyGroup> load() {
         PriorityQueue<StudyGroup> collection = new PriorityQueue<>();
 
@@ -69,7 +84,11 @@ public class FileManager {
         return collection;
     }
 
-    
+    /**
+     * Сохраняет переданную коллекцию объектов {@link StudyGroup} в XML-файл.
+     *
+     * @param collection коллекция, которая будет сериализована и записана в файл
+     */
     public void save(PriorityQueue<StudyGroup> collection) {
 
         try (FileOutputStream fos = new FileOutputStream(filename)) {
@@ -82,6 +101,12 @@ public class FileManager {
         }
     }
 
+    /**
+     * Преобразует коллекцию учебных групп в строку с XML-представлением.
+     *
+     * @param collection коллекция для сериализации
+     * @return строка с XML, описывающим все элементы коллекции
+     */
     private String convertToXml(PriorityQueue<StudyGroup> collection) {
 
         StringBuilder sb = new StringBuilder();
@@ -160,6 +185,13 @@ public class FileManager {
     }
 
 
+    /**
+     * Создаёт объект {@link StudyGroup} на основе XML-элемента.
+     * Извлекает все необходимые поля, включая координаты и администратора группы.
+     *
+     * @param element XML-элемент, описывающий одну учебную группу
+     * @return восстановленный из XML объект {@link StudyGroup}
+     */
     private StudyGroup parseStudyGroup(Element element) {
 
         Integer id = Integer.parseInt(getTagValue(element, "id"));
@@ -213,6 +245,13 @@ public class FileManager {
         return new StudyGroup(id, name, coordinates, creationDate, studentsCount, expelledStudents, transferredStudents, semester, admin);
     }
 
+    /**
+     * Вспомогательный метод для получения текстового содержимого вложенного тега.
+     *
+     * @param element родительский XML-элемент
+     * @param tagName имя дочернего тега, значение которого необходимо получить
+     * @return текстовое содержимое тега или {@code null}, если тег отсутствует
+     */
     private String getTagValue(Element element, String tagName) {
         NodeList list = element.getElementsByTagName(tagName);
         if (list.getLength() == 0) return null;

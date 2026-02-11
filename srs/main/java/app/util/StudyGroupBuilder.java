@@ -12,16 +12,30 @@ import model.Semester;
 import model.StudyGroup;
 
 /**
- * Класс для пошагового создания StudyGroup через консоль.
+ * Класс для пошагового создания объектов {@link StudyGroup} через консольный ввод.
+ * Запрашивает у пользователя значения всех полей учебной группы и связанных сущностей
+ * (координаты, администратор, семестр и т.д.), выполняя базовую валидацию входных данных.
+ *
+ * Используется командами, реализующими добавление и изменение элементов коллекции.
  */
 public class StudyGroupBuilder {
 
     private final Scanner scanner;
 
+    /**
+     * Создаёт новый билдер для построения объектов {@link StudyGroup}.
+     *
+     * @param scanner объект {@link Scanner}, используемый для чтения пользовательского ввода
+     */
     public StudyGroupBuilder(Scanner scanner) {
         this.scanner = scanner;
     }
 
+    /**
+     * Пошагово запрашивает у пользователя данные и создаёт новый объект {@link StudyGroup}.
+     *
+     * @return сконструированный объект {@link StudyGroup} с валидными полями
+     */
     public StudyGroup build() {
 
         String name = readName();
@@ -35,6 +49,12 @@ public class StudyGroupBuilder {
         return new StudyGroup(IdGenerator.generateId(), name, coordinates, LocalDate.now(), studentsCount, expelledStudents, transferredStudents, semester, admin);
     }
 
+    /**
+     * Запрашивает у пользователя название учебной группы до тех пор,
+     * пока не будет введена непустая строка.
+     *
+     * @return корректное название группы
+     */
     private String readName() {
         while (true) {
             System.out.println("Enter group name: ");
@@ -49,6 +69,12 @@ public class StudyGroupBuilder {
         }
     }
 
+    /**
+     * Запрашивает у пользователя количество студентов в группе.
+     * Проверяет, что введено целое число больше нуля.
+     *
+     * @return количество студентов в группе
+     */
     private int readStudentsCount() {
         while (true) {
             
@@ -68,6 +94,13 @@ public class StudyGroupBuilder {
         }
     }
 
+    /**
+     * Запрашивает у пользователя количество отчисленных студентов.
+     * Разрешает пустой ввод (в этом случае возвращается {@code null}).
+     * При наличии значения проверяет, что оно больше нуля.
+     *
+     * @return количество отчисленных студентов или {@code null}, если значение не задано
+     */
     private Long readExpelledStudents() {
         while (true) {
             try {
@@ -92,6 +125,12 @@ public class StudyGroupBuilder {
         }
     }
 
+    /**
+     * Запрашивает у пользователя значение семестра из перечисления {@link Semester}.
+     * Разрешает пустой ввод (в этом случае возвращается {@code null}).
+     *
+     * @return выбранный семестр или {@code null}, если значение не задано
+     */
     private Semester readSemester() {
         while (true) {
             try {
@@ -115,6 +154,12 @@ public class StudyGroupBuilder {
         }
     }
 
+    /**
+     * Запрашивает у пользователя координаты X и Y.
+     * Проверяет корректность числового ввода и создаёт объект {@link Coordinates}.
+     *
+     * @return объект координат с введёнными значениями
+     */
     private Coordinates readCoordinates() {
         while (true) {
             try {
@@ -132,6 +177,12 @@ public class StudyGroupBuilder {
         }
     }
 
+    /**
+     * Запрашивает у пользователя количество переведённых студентов.
+     * Проверяет, что введено целое число больше нуля.
+     *
+     * @return количество переведённых студентов
+     */
     private int readTransferredStudents() {
         while (true) {
             
@@ -151,6 +202,12 @@ public class StudyGroupBuilder {
         }        
     }
 
+    /**
+     * Запрашивает у пользователя данные администратора группы:
+     * имя, дату рождения (в миллисекундах), цвет глаз и национальность.
+     *
+     * @return объект {@link Person} с введёнными пользователем данными
+     */
     private Person readPerson() {
 
         String name;
