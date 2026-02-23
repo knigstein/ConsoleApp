@@ -37,7 +37,7 @@ public class StudyGroup implements Comparable<StudyGroup> {
      * @param transferredStudents количество переведённых студентов, должно быть больше 0
      * @param semesterEnum семестр обучения, может быть {@code null}, если не задан
      * @param groupAdmin администратор группы, не может быть {@code null}
-     * @throws IllegalArgumentException если нарушены ограничения
+     * @throws IllegalArgumentException если нарушены ограничения на значения полей
      */
     public StudyGroup(Integer id, String name, Coordinates coordinates, LocalDate creationDate, int studentsCount, Long expelledStudents, int transferredStudents, Semester semesterEnum, Person groupAdmin) {
 

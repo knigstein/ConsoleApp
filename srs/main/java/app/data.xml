@@ -1,78 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <studyGroups>
-  <studyGroup>
-    <id>2</id>
-    <name>Physics Group</name>
-    <creationDate>2023-09-15</creationDate>
-    <studentsCount>18</studentsCount>
-    <expelledStudents>1</expelledStudents>
-    <transferredStudents>2</transferredStudents>
-    <semesterEnum>FIRST</semesterEnum>
-    <coordinates>
-      <x>5</x>
-      <y>15.0</y>
-    </coordinates>
-    <groupAdmin>
-      <name>Anna Smirnova</name>
-      <birthday>3111999</birthday>
-      <eyeColor>BLUE</eyeColor>
-      <nationality>GERMANY</nationality>
-    </groupAdmin>
-  </studyGroup>
-  <studyGroup>
-    <id>4</id>
-    <name>Programming</name>
-    <creationDate>2026-02-11</creationDate>
-    <studentsCount>24</studentsCount>
-    <expelledStudents>4</expelledStudents>
-    <transferredStudents>1</transferredStudents>
-    <semesterEnum>FIRST</semesterEnum>
-    <coordinates>
-      <x>10</x>
-      <y>12.0</y>
-    </coordinates>
-    <groupAdmin>
-      <name>Gavrilov Anton</name>
-      <birthday>12101980</birthday>
-      <eyeColor>GREEN</eyeColor>
-      <nationality>RUSSIA</nationality>
-    </groupAdmin>
-  </studyGroup>
-  <studyGroup>
-    <id>3</id>
-    <name>History Group</name>
-    <creationDate>2022-01-10</creationDate>
-    <studentsCount>30</studentsCount>
-    <expelledStudents>1</expelledStudents>
-    <transferredStudents>5</transferredStudents>
-    <semesterEnum>THIRD</semesterEnum>
-    <coordinates>
-      <x>7</x>
-      <y>30.2</y>
-    </coordinates>
-    <groupAdmin>
-      <name>John Smith</name>
-      <birthday>20021998</birthday>
-      <eyeColor>BROWN</eyeColor>
-      <nationality>USA</nationality>
-    </groupAdmin>
-  </studyGroup>
-  <studyGroup>
-    <id>1</id>
-    <name>Math Group</name>
-    <creationDate>2026-02-11</creationDate>
-    <studentsCount>132</studentsCount>
-    <expelledStudents>89</expelledStudents>
-    <transferredStudents>2</transferredStudents>
-    <semesterEnum>SIXTH</semesterEnum>
-    <coordinates>
-      <x>123</x>
-      <y>1243123.0</y>
-    </coordinates>
-    <groupAdmin>
-      <name>Alex Vivn</name>
-      <birthday>12342007</birthday>
-      <eyeColor>BROWN</eyeColor>
-      <nationality>SPAIN</nationality>
-    </groupAdmin>
-  </studyGroup>
+
+    <studyGroup>
+        <id>1</id>
+        <name>Mathematics Group</name>
+        <coordinates>
+            <x>10</x>
+            <y>20.5</y>
+        </coordinates>
+        <creationDate>2024-03-01</creationDate>
+        <studentsCount>25</studentsCount>
+        <expelledStudents>2</expelledStudents>
+        <transferredStudents>3</transferredStudents>
+        <semesterEnum>SECOND</semesterEnum>
+        <groupAdmin>
+            <name>Ivan Petrov</name>
+            <birthday>12062021</birthday>
+            <eyeColor>GREEN</eyeColor>
+            <nationality>RUSSIA</nationality>
+        </groupAdmin>
+    </studyGroup>
+
+    <studyGroup>
+        <id>2</id>
+        <name>Physics Group</name>
+        <coordinates>
+            <x>5</x>
+            <y>15.0</y>
+        </coordinates>
+        <creationDate>2023-09-15</creationDate>
+        <studentsCount>18</studentsCount>
+        <expelledStudents>1</expelledStudents>
+        <transferredStudents>12</transferredStudents>
+        <semesterEnum>FIRST</semesterEnum>
+        <groupAdmin>
+            <name>Anna Smirnova</name>
+            <birthday>12022023</birthday>
+            <eyeColor>BLUE</eyeColor>
+            <nationality>GERMANY</nationality>
+        </groupAdmin>
+    </studyGroup>
+
+    <studyGroup>
+        <id>3</id>
+        <name>History Group</name>
+        <coordinates>
+            <x>7</x>
+            <y>30.2</y>
+        </coordinates>
+        <creationDate>2022-01-10</creationDate>
+        <studentsCount>30</studentsCount>
+        <expelledStudents>13</expelledStudents>
+        <transferredStudents>5</transferredStudents>
+        <semesterEnum>THIRD</semesterEnum>
+        <groupAdmin>
+            <name>John Smith</name>
+            <birthday>12052026</birthday>
+            <eyeColor>BROWN</eyeColor>
+            <nationality>USA</nationality>
+        </groupAdmin>
+    </studyGroup>
+
 </studyGroups>

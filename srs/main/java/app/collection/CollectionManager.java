@@ -241,4 +241,16 @@ public class CollectionManager {
                 .forEach(System.out::println);
     }
 
+    public StudyGroup getById(Integer id) {
+        if (id == null) return null;
+
+        for (StudyGroup group : collection) {
+            if (group.getId().equals(id)) {
+                return group;
+            }
+        }
+
+        return null;
+    }
+
 }

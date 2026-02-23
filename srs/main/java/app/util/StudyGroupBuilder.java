@@ -79,17 +79,17 @@ public class StudyGroupBuilder {
         while (true) {
             
             try {
-                System.out.println("Enter quantity of students");
+                System.out.println("Введите количество студентов (>0)");
                 int value = Integer.parseInt(scanner.nextLine());
 
                 if (value <= 0) {
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException("Количество студентов должно быть >0");
                 }
 
                 return value;
 
             } catch (Exception e) {
-                System.out.println("Enter error");
+                System.out.println("Ошибка ввода");
             }
         }
     }
@@ -149,7 +149,7 @@ public class StudyGroupBuilder {
                 return Semester.valueOf(input.trim());
 
             } catch (Exception e) {
-                System.out.println("Некорректное значение. Повторите.");
+                System.out.println("Ошибка ввода. Повторите.");
             }
         }
     }
@@ -172,7 +172,7 @@ public class StudyGroupBuilder {
                 return new Coordinates(x, y);
 
             } catch (Exception e) {
-                System.out.println("Ошибка ввода координат.");
+                System.out.println("Ошибка ввода.");
             }
         }
     }
@@ -187,7 +187,7 @@ public class StudyGroupBuilder {
         while (true) {
             
             try {
-                System.out.println("Enter quantity of transferred students");
+                System.out.println("Введите количество переведенных студентов");
                 int value = Integer.parseInt(scanner.nextLine());
 
                 if (value <= 0) {
@@ -197,7 +197,7 @@ public class StudyGroupBuilder {
                 return value;
 
             } catch (Exception e) {
-                System.out.println("Enter error");
+                System.out.println("Ошибка ввода");
             }
         }        
     }
@@ -216,19 +216,19 @@ public class StudyGroupBuilder {
             name = scanner.nextLine();
 
             if (name.trim().isEmpty()) {
-                System.out.println("Имя не может быть пустым.");
+                System.out.println("Это поле не может быть пустым.");
             } else break;
         }
 
         Date birthday;
         while (true) {
             try {
-                System.out.print("Введите дату рождения (миллисекунды): ");
+                System.out.print("Введите дату рождения (Формат: 13062007): ");
                 long millis = Long.parseLong(scanner.nextLine());
                 birthday = new Date(millis);
                 break;
             } catch (Exception e) {
-                System.out.println("Ошибка ввода даты.");
+                System.out.println("Ошибка ввода");
             }
         }
 
@@ -237,18 +237,18 @@ public class StudyGroupBuilder {
         for (Color c : Color.values()) {
             System.out.println("- " + c);
         }
-        System.out.print("Введите цвет (пусто если null): ");
+        System.out.print("Введите цвет: ");
         String eye = scanner.nextLine();
         if (!eye.trim().isEmpty()) {
             eyeColor = Color.valueOf(eye.trim());
         }
 
         Country nationality = null;
-        System.out.println("Доступные страны:");
+        System.out.println("Доступные страны: ");
         for (Country c : Country.values()) {
             System.out.println("- " + c);
         }
-        System.out.print("Введите страну (пусто если null): ");
+        System.out.print("Введите страну: ");
         String nat = scanner.nextLine();
         if (!nat.trim().isEmpty()) {
             nationality = Country.valueOf(nat.trim());
@@ -256,5 +256,4 @@ public class StudyGroupBuilder {
 
         return new Person(name, birthday, eyeColor, nationality);
     }
-
 }

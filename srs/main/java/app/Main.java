@@ -40,33 +40,32 @@ public class Main {
         }
 
         CommandManager commandManager = new CommandManager();
-        Scanner scanner = new Scanner(System.in);
+        //Scanner scanner = new Scanner(System.in);
 
         // Регистрация команд
         commandManager.register("help", new HelpCommand(commandManager));
         commandManager.register("info", new InfoCommand(collectionManager));
         commandManager.register("show", new ShowCommand(collectionManager));
-        commandManager.register("add", new AddCommand(collectionManager, scanner));
+        commandManager.register("add", new AddCommand(collectionManager));
         commandManager.register("remove_by_id", new RemoveByIdCommand(collectionManager));
         commandManager.register("remove_first", new RemoveFirstCommand(collectionManager));
         commandManager.register("clear", new ClearCommand(collectionManager));
         commandManager.register("save", new SaveCommand(collectionManager, fileManager));
         commandManager.register("exit", new ExitCommand());
-        commandManager.register("update", new UpdateCommand(collectionManager, scanner));
-        commandManager.register("add_if_min", new AddIfMinCommand(collectionManager, scanner));
-        commandManager.register("remove_lower", new RemoveLowerCommand(collectionManager, scanner));
+        commandManager.register("update", new UpdateCommand(collectionManager));
+        commandManager.register("add_if_min", new AddIfMinCommand(collectionManager, null));
+        commandManager.register("remove_lower", new RemoveLowerCommand(collectionManager, null));
         commandManager.register("filter_contains_name", new FilterContainsNameCommand(collectionManager));
         commandManager.register("filter_greater_than_semester_enum", new FilterGreaterThanSemesterCommand(collectionManager));
         commandManager.register("print_field_descending_group_admin", new PrintFieldDescendingGroupAdminCommand(collectionManager));
         commandManager.register("execute_script", new ExecuteScriptCommand(commandManager));
 
-        ConsoleManager console = new ConsoleManager();
+        Scanner consoleScanner = new Scanner(System.in);
 
-        // Интерактивный режим
         while (true) {
-            System.out.print("> ");
-            String input = console.readLine();
-            commandManager.execute(input);
+        System.out.print("> ");
+        String input = consoleScanner.nextLine();
+        commandManager.execute(input, consoleScanner);
         }
     }
 }
