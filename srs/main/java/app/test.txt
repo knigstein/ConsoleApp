@@ -1,7 +1,7 @@
 add
 Script Group 1
 10
-15.5
+15
 25
 2
 3

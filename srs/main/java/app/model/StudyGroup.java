@@ -28,18 +28,26 @@ public class StudyGroup implements Comparable<StudyGroup> {
     /**
      * Создаёт новый объект учебной группы с указанными параметрами.
      *
-     * @param id уникальный идентификатор группы, не может быть {@code null} и должен быть больше 0
-     * @param name название группы, не может быть {@code null} и пустой строкой
-     * @param coordinates координаты группы, не могут быть {@code null}
-     * @param creationDate дата создания группы, не может быть {@code null}
-     * @param studentsCount количество студентов в группе, должно быть больше 0
-     * @param expelledStudents количество отчисленных студентов, должно быть больше 0, может быть {@code null}
+     * @param id                уникальный идентификатор группы, не может быть {@code null} и должен быть больше 0
+     * @param name              название группы, не может быть {@code null} и пустой строкой
+     * @param coordinates       координаты группы, не могут быть {@code null}
+     * @param creationDate      дата создания группы, не может быть {@code null}
+     * @param studentsCount     количество студентов в группе, должно быть больше 0
+     * @param expelledStudents  количество отчисленных студентов, должно быть больше 0, может быть {@code null}
      * @param transferredStudents количество переведённых студентов, должно быть больше 0
-     * @param semesterEnum семестр обучения, может быть {@code null}, если не задан
-     * @param groupAdmin администратор группы, не может быть {@code null}
+     * @param semesterEnum      семестр обучения, может быть {@code null}, если не задан
+     * @param groupAdmin        администратор группы, не может быть {@code null}
      * @throws IllegalArgumentException если нарушены ограничения на значения полей
      */
-    public StudyGroup(Integer id, String name, Coordinates coordinates, LocalDate creationDate, int studentsCount, Long expelledStudents, int transferredStudents, Semester semesterEnum, Person groupAdmin) {
+    public StudyGroup(Integer id,
+                      String name,
+                      Coordinates coordinates,
+                      LocalDate creationDate,
+                      int studentsCount,
+                      Long expelledStudents,
+                      int transferredStudents,
+                      Semester semesterEnum,
+                      Person groupAdmin) {
 
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("id cannot be null and must be more than 0");
@@ -61,12 +69,12 @@ public class StudyGroup implements Comparable<StudyGroup> {
             throw new IllegalArgumentException("studentsCount must be more than 0");
         }
 
-        if (expelledStudents <= 0) {
-            throw new IllegalArgumentException("expelledStudents must be more than 0, but can be nullable");
+        if (expelledStudents != null && expelledStudents <= 0) {
+            throw new IllegalArgumentException("expelledStudents must be more than 0 when specified");
         }
 
         if (transferredStudents <= 0) {
-            throw new IllegalArgumentException("transferredStudents must be more than 0, but can be nullable"); 
+            throw new IllegalArgumentException("transferredStudents must be more than 0");
         }
 
         if (groupAdmin == null) {
