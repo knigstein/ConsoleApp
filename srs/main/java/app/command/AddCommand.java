@@ -90,7 +90,10 @@ public class AddCommand implements Command, ScriptAware {
             String adminName = input.readString("Имя админа:", false, null);
             Date birthday = input.readDate("Дата рождения:", false, null);
 
-            Person admin = new Person(adminName, birthday, null, null);
+            Color eyeColor = input.readEnum("Цвет глаз (пусто если null):", Color.class, true, null);
+            Country nationality = input.readEnum("Национальность (пусто если null):", Country.class, true, null);
+
+            Person admin = new Person(adminName, birthday, eyeColor, nationality);
 
             StudyGroup group = new StudyGroup(
                     IdGenerator.generateId(),

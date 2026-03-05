@@ -1,3 +1,0 @@
-execute_script test4.txt
-execute_script test4.txt
-execute_script test4.txt

@@ -102,8 +102,10 @@ public class UpdateCommand implements Command, ScriptAware {
                             existing.getGroupAdmin().getName()),
                     input.readDate("Дата рождения:", false,
                             existing.getGroupAdmin().getBirthday()),
-                    null,
-                    null
+                    input.readEnum("Цвет глаз:", Color.class, true,
+                            existing.getGroupAdmin().getEyeColor()),
+                    input.readEnum("Национальность:", Country.class, true,
+                            existing.getGroupAdmin().getNationality())
             );
 
             StudyGroup updated = new StudyGroup(
