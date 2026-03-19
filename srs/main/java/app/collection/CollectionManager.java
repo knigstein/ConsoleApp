@@ -5,6 +5,9 @@ import model.StudyGroup;
 
 import java.time.LocalDateTime;
 import java.util.PriorityQueue;
+import java.util.List;
+import java.util.Optional;
+import java.util.Comparator;
 
 import io.FileManager;
 
@@ -101,14 +104,7 @@ public class CollectionManager {
      * @return {@code true}, если элемент был найден и заменён, иначе {@code false}
      */
     public boolean update(int id, StudyGroup newGroup) {
-        for (StudyGroup group : collection) {
-            if (group.getId() == id) {
-                collection.remove(group);
-                collection.add(newGroup);
-                return true;
-            }
-        }
-        return false;
+        return replaceById(id, newGroup);
     }
 
     /**
@@ -118,7 +114,7 @@ public class CollectionManager {
      * @return {@code true}, если элемент был найден и удалён, иначе {@code false}
      */
     public boolean removeById(Integer id) {
-        return collection.removeIf(group -> group.getId().equals(id));
+        return removeAndReturnById(id).isPresent();
     }
 
     /**
@@ -138,28 +134,11 @@ public class CollectionManager {
      * @return {@code true}, если элемент был найден и обновлён, иначе {@code false}
      */
     public boolean updateById(Integer id, StudyGroup newGroup) {
-
-        StudyGroup existing = null;
-
-        for (StudyGroup group : collection) {
-            if (group.getId().equals(id)) {
-                existing = group;
-                break;
-            }
-        }
-
-        if (existing == null) {
+        if (id == null || newGroup == null) {
             return false;
         }
-
-        collection.remove(existing);
-
-        // Сохраняем старый id
         newGroup.setId(id);
-
-        collection.add(newGroup);
-
-        return true;
+        return replaceById(id, newGroup);
     }
 
     /**
@@ -170,19 +149,11 @@ public class CollectionManager {
      * @return {@code true}, если элемент был добавлен, иначе {@code false}
      */
     public boolean addIfMin(StudyGroup group) {
-
-        if (collection.isEmpty()) {
+        Optional<StudyGroup> min = collection.stream().min(Comparator.naturalOrder());
+        if (min.isEmpty() || group.compareTo(min.get()) < 0) {
             collection.add(group);
             return true;
         }
-
-        StudyGroup first = collection.peek();
-
-        if (group.compareTo(first) < 0) {
-            collection.add(group);
-            return true;
-        }
-
         return false;
     }
 
@@ -194,12 +165,12 @@ public class CollectionManager {
      * @return количество удалённых элементов
      */
     public int removeLower(StudyGroup group) {
+        List<StudyGroup> toRemove = collection.stream()
+                .filter(existing -> existing.compareTo(group) < 0)
+                .toList();
 
-        int before = collection.size();
-
-        collection.removeIf(existing -> existing.compareTo(group) < 0);
-
-        return before - collection.size();
+        collection.removeAll(toRemove);
+        return toRemove.size();
     }
 
     /**
@@ -242,15 +213,55 @@ public class CollectionManager {
     }
 
     public StudyGroup getById(Integer id) {
-        if (id == null) return null;
+        if (id == null) {
+            return null;
+        }
+        return collection.stream()
+                .filter(g -> id.equals(g.getId()))
+                .findFirst()
+                .orElse(null);
+    }
 
-        for (StudyGroup group : collection) {
-            if (group.getId().equals(id)) {
-                return group;
-            }
+    /**
+     * Заменяет элемент с указанным id на новый объект.
+     *
+     * @param id идентификатор заменяемого элемента
+     * @param newGroup новый объект, который будет сохранён в коллекции
+     * @return {@code true}, если элемент с таким id найден и заменён
+     */
+    public boolean replaceById(Integer id, StudyGroup newGroup) {
+        if (id == null || newGroup == null) {
+            return false;
         }
 
-        return null;
+        Optional<StudyGroup> existing = collection.stream()
+                .filter(g -> id.equals(g.getId()))
+                .findFirst();
+
+        if (existing.isEmpty()) {
+            return false;
+        }
+
+        collection.remove(existing.get());
+        collection.add(newGroup);
+        return true;
+    }
+
+    /**
+     * Удаляет элемент по id.
+     *
+     * @param id идентификатор
+     * @return удалённый элемент, если он существовал
+     */
+    public Optional<StudyGroup> removeAndReturnById(Integer id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+        Optional<StudyGroup> existing = collection.stream()
+                .filter(g -> id.equals(g.getId()))
+                .findFirst();
+        existing.ifPresent(collection::remove);
+        return existing;
     }
 
 }

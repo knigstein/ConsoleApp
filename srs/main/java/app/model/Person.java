@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Date;
  * Класс используется как часть доменной модели приложения для управления коллекцией
  * объектов {@link StudyGroup}.
  */
-public class Person {
+public class Person implements Serializable {
     private String name;
     private Date birthday;
     private Color eyeColor;

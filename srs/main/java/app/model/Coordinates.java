@@ -1,5 +1,7 @@
 package model;
 
+import java.io.Serializable;
+
 /**
  * Класс координат.
  * Описывает двумерные координаты с целочисленным значением по оси X
@@ -7,7 +9,7 @@ package model;
  *
  * Используется как составная часть доменной модели учебной группы.
  */
-public class Coordinates {
+public class Coordinates implements Serializable {
 
     private int x;
     private Double y;

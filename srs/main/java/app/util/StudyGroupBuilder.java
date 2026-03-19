@@ -46,7 +46,8 @@ public class StudyGroupBuilder {
         Semester semester = readSemester();
         Person admin = readPerson();
 
-        return new StudyGroup(IdGenerator.generateId(), name, coordinates, LocalDate.now(), studentsCount, expelledStudents, transferredStudents, semester, admin);
+        // id и creationDate будут перегенерированы/зафиксированы на сервере.
+        return new StudyGroup(1, name, coordinates, LocalDate.now(), studentsCount, expelledStudents, transferredStudents, semester, admin);
     }
 
     /**

@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
@@ -14,7 +15,7 @@ import java.time.LocalDate;
  *
  * Класс является частью доменной модели приложения для управления коллекцией учебных групп.
  */
-public class StudyGroup implements Comparable<StudyGroup> {
+public class StudyGroup implements Comparable<StudyGroup>, Serializable {
     private Integer id;
     private String name;
     private Coordinates coordinates;
