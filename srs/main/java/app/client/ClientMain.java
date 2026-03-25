@@ -5,9 +5,12 @@ import input.InputHandler;
 import model.*;
 import util.StudyGroupBuilder;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * Клиентское приложение.
@@ -18,6 +21,12 @@ public class ClientMain {
 
     private static final int DEFAULT_PORT = 5555;
     private static final String DEFAULT_HOST = "localhost";
+
+    /**
+     * Набор имён файлов скриптов, которые в данный момент находятся в процессе выполнения.
+     * Используется для предотвращения прямой и косвенной рекурсии при вызове {@code execute_script}.
+     */
+    private static final Set<String> executingScripts = new HashSet<>();
 
     public static void main(String[] args) {
 
@@ -54,6 +63,11 @@ public class ClientMain {
 
                 if ("save".equals(cmd)) {
                     System.out.println("Команда save недоступна на клиенте. Сохранение выполняет только сервер.");
+                    continue;
+                }
+
+                if ("execute_script".equals(cmd)) {
+                    executeScript(parts, network, scanner);
                     continue;
                 }
 
@@ -181,6 +195,98 @@ public class ClientMain {
         }
     }
 
+    /**
+     * Выполняет команды из файла-скрипта.
+     * Каждая строка файла интерпретируется как пользовательский ввод.
+     * 
+     * @param parts аргументы команды (parts[1] - имя файла)
+     * @param network сетевой клиент для отправки команд на сервер
+     * @param scanner основной сканер консоли
+     */
+    private static void executeScript(String[] parts, ClientNetwork network, Scanner scanner) {
+        if (parts.length < 2) {
+            System.out.println("Не указано имя файла.");
+            return;
+        }
+
+        String fileName = parts[1];
+        File file = new File(fileName);
+
+        if (!file.exists()) {
+            System.out.println("Файл не найден.");
+            return;
+        }
+
+        if (executingScripts.contains(fileName)) {
+            System.out.println("Рекурсия запрещена.");
+            return;
+        }
+
+        executingScripts.add(fileName);
+
+        try (Scanner fileScanner = new Scanner(file)) {
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine().trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
+
+                String[] cmdParts = line.split("\\s+");
+                String cmd = cmdParts[0];
+
+                if ("execute_script".equals(cmd)) {
+                    System.out.println("Вложенный вызов execute_script из скрипта: " + line);
+                    String nestedFileName = cmdParts.length > 1 ? cmdParts[1] : "";
+                    if (executingScripts.contains(nestedFileName)) {
+                        System.out.println("Рекурсия запрещена.");
+                        continue;
+                    }
+                    executeScript(new String[]{"execute_script", nestedFileName}, network, scanner);
+                    continue;
+                }
+
+                if ("exit".equals(cmd)) {
+                    System.out.println("Команда exit в скрипте игнорируется.");
+                    continue;
+                }
+
+                if ("save".equals(cmd)) {
+                    System.out.println("Команда save недоступна на клиенте.");
+                    continue;
+                }
+
+                if ("help".equals(cmd)) {
+                    printHelp();
+                    continue;
+                }
+
+                try {
+                    CommandDTO dto = buildCommandDTO(cmd, cmdParts, fileScanner);
+                    if (dto == null) {
+                        System.out.println("Неизвестная команда в скрипте: " + cmd);
+                        continue;
+                    }
+
+                    CommandResponseDTO response = network.sendAndReceive(dto);
+                    handleResponse(response);
+
+                } catch (IOException e) {
+                    System.out.println("Ошибка сети при выполнении скрипта: " + e.getMessage());
+                    break;
+                } catch (ClassNotFoundException e) {
+                    System.out.println("Ошибка десериализации ответа от сервера.");
+                    break;
+                } catch (Exception e) {
+                    System.out.println("Ошибка при выполнении команды в скрипте: " + e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Ошибка чтения файла скрипта.");
+        } finally {
+            executingScripts.remove(fileName);
+        }
+    }
+
     private static void printHelp() {
         System.out.println("Доступные команды клиента:");
         System.out.println("  info");
@@ -195,6 +301,7 @@ public class ClientMain {
         System.out.println("  filter_contains_name <substring>");
         System.out.println("  filter_greater_than_semester_enum <SEMESTER>");
         System.out.println("  print_field_descending_group_admin");
+        System.out.println("  execute_script <filename>");
         System.out.println("  exit");
         System.out.println("Команда save доступна только на сервере и из клиента не отправляется.");
     }

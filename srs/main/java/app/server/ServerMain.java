@@ -123,6 +123,7 @@ public class ServerMain {
         manager.register(FilterContainsNameCommandDTO.class, new FilterContainsNameServerCommand());
         manager.register(FilterGreaterThanSemesterCommandDTO.class, new FilterGreaterThanSemesterServerCommand());
         manager.register(PrintFieldDescendingGroupAdminCommandDTO.class, new PrintFieldDescendingGroupAdminServerCommand());
+        manager.register(ExecuteScriptCommandDTO.class, new ExecuteScriptServerCommand());
     }
 
     private static void handleRequest(DatagramChannel channel,
