@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tar *)",
+      "Bash(./build.sh)",
+      "Bash(file *)",
+      "Bash(find *)",
+      "Bash(cp *)",
+      "Bash(ls *)",
+      "Bash(java *)",
+      "Bash(javac *)",
+      "Bash(bash *)",
+      "Bash(timeout *)",
+      "Bash(true)",
+      "Bash(jar *)",
+      "Bash(sleep *)",
+      "Bash(ps *)",
+      "Bash(kill *)",
+      "Bash(wait *)",
+      "Bash(cd *)",
+      "Bash(echo *)",
+      "Bash(chmod *)",
+      "Bash(rm *)",
+      "Bash(cat *)",
+      "Bash(nslookup *)",
+      "Bash(ping *)",
+      "Bash(nc *)",
+      "Bash(xxd *)",
+      "Bash(od *)",
+      "Bash(sh *)",
+      "Bash(git add *)",
+      "Bash(git reset *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
+    ]
+  },
+  "$version": 3
+}

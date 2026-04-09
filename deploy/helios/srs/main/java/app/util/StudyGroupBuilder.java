@@ -1,0 +1,291 @@
+package util;
+
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.Scanner;
+
+import model.Color;
+import model.Coordinates;
+import model.Country;
+import model.Person;
+import model.Semester;
+import model.StudyGroup;
+
+/**
+ * Класс для пошагового создания объектов {@link StudyGroup} через консольный ввод.
+ * Запрашивает у пользователя значения всех полей учебной группы и связанных сущностей
+ * (координаты, администратор, семестр и т.д.), выполняя базовую валидацию входных данных.
+ *
+ * Используется командами, реализующими добавление и изменение элементов коллекции.
+ */
+public class StudyGroupBuilder {
+
+    private final Scanner scanner;
+
+    /**
+     * Создаёт новый билдер для построения объектов {@link StudyGroup}.
+     *
+     * @param scanner объект {@link Scanner}, используемый для чтения пользовательского ввода
+     */
+    public StudyGroupBuilder(Scanner scanner) {
+        this.scanner = scanner;
+    }
+
+    /**
+     * Пошагово запрашивает у пользователя данные и создаёт новый объект {@link StudyGroup}.
+     *
+     * @return сконструированный объект {@link StudyGroup} с валидными полями
+     */
+    public StudyGroup build() {
+
+        String name = readName();
+        Coordinates coordinates = readCoordinates();
+        int studentsCount = readStudentsCount();
+        Long expelledStudents = readExpelledStudents();
+        int transferredStudents = readTransferredStudents();
+        Semester semester = readSemester();
+        Person admin = readPerson();
+
+        // id и creationDate будут перегенерированы/зафиксированы на сервере.
+        return new StudyGroup(1, name, coordinates, LocalDate.now(), studentsCount, expelledStudents, transferredStudents, semester, admin);
+    }
+
+    /**
+     * Запрашивает у пользователя название учебной группы до тех пор,
+     * пока не будет введена непустая строка.
+     *
+     * @return корректное название группы
+     */
+    private String readName() {
+        while (true) {
+            System.out.println("Enter group name: ");
+            String input = scanner.nextLine();
+
+            if (input == null || input.trim().isEmpty()) {
+                System.out.println("Name of group cannot be null");
+
+            } else {
+                return input.trim();
+            }
+        }
+    }
+
+    /**
+     * Запрашивает у пользователя количество студентов в группе.
+     * Проверяет, что введено целое число больше нуля.
+     *
+     * @return количество студентов в группе
+     */
+    private int readStudentsCount() {
+        while (true) {
+            
+            try {
+                System.out.println("Введите количество студентов (>0)");
+                int value = Integer.parseInt(scanner.nextLine());
+
+                if (value <= 0) {
+                    throw new IllegalArgumentException("Количество студентов должно быть >0");
+                }
+
+                return value;
+
+            } catch (Exception e) {
+                System.out.println("Ошибка ввода");
+            }
+        }
+    }
+
+    /**
+     * Запрашивает у пользователя количество отчисленных студентов.
+     * Разрешает пустой ввод (в этом случае возвращается {@code null}).
+     * При наличии значения проверяет, что оно больше нуля.
+     *
+     * @return количество отчисленных студентов или {@code null}, если значение не задано
+     */
+    private Long readExpelledStudents() {
+        while (true) {
+            try {
+                System.out.print("Введите количество отчисленных (>0, пусто если null): ");
+                String input = scanner.nextLine();
+
+                if (input.trim().isEmpty()) {
+                    return null;
+                }
+
+                Long value = Long.parseLong(input);
+
+                if (value <= 0) {
+                    throw new IllegalArgumentException();
+                }
+
+                return value;
+
+            } catch (Exception e) {
+                System.out.println("Ошибка ввода. Повторите.");
+            }
+        }
+    }
+
+    /**
+     * Запрашивает у пользователя значение семестра из перечисления {@link Semester}.
+     * Разрешает пустой ввод (в этом случае возвращается {@code null}).
+     *
+     * @return выбранный семестр или {@code null}, если значение не задано
+     */
+    private Semester readSemester() {
+        while (true) {
+            try {
+                System.out.println("Доступные семестры:");
+                for (Semester s : Semester.values()) {
+                    System.out.println("- " + s);
+                }
+
+                System.out.print("Введите семестр (пусто если null): ");
+                String input = scanner.nextLine();
+
+                if (input.trim().isEmpty()) {
+                    return null;
+                }
+
+                return Semester.valueOf(input.trim());
+
+            } catch (Exception e) {
+                System.out.println("Ошибка ввода. Повторите.");
+            }
+        }
+    }
+
+    /**
+     * Запрашивает у пользователя координаты X и Y.
+     * Проверяет корректность числового ввода и создаёт объект {@link Coordinates}.
+     *
+     * @return объект координат с введёнными значениями
+     */
+    private Coordinates readCoordinates() {
+        while (true) {
+            try {
+                System.out.print("Введите x: ");
+                int x = Integer.parseInt(scanner.nextLine());
+
+                System.out.print("Введите y (не null): ");
+                Double y = Double.parseDouble(scanner.nextLine());
+
+                return new Coordinates(x, y);
+
+            } catch (Exception e) {
+                System.out.println("Ошибка ввода.");
+            }
+        }
+    }
+
+    /**
+     * Запрашивает у пользователя количество переведённых студентов.
+     * Проверяет, что введено целое число больше нуля.
+     *
+     * @return количество переведённых студентов
+     */
+    private int readTransferredStudents() {
+        while (true) {
+            
+            try {
+                System.out.println("Введите количество переведенных студентов");
+                int value = Integer.parseInt(scanner.nextLine());
+
+                if (value <= 0) {
+                    throw new IllegalArgumentException();
+                }
+
+                return value;
+
+            } catch (Exception e) {
+                System.out.println("Ошибка ввода");
+            }
+        }        
+    }
+
+    /**
+     * Запрашивает у пользователя данные администратора группы:
+     * имя, дату рождения (в миллисекундах), цвет глаз и национальность.
+     *
+     * @return объект {@link Person} с введёнными пользователем данными
+     */
+    private Person readPerson() {
+
+        String name;
+        while (true) {
+            System.out.print("Введите имя администратора: ");
+            name = scanner.nextLine();
+
+            if (name.trim().isEmpty()) {
+                System.out.println("Это поле не может быть пустым.");
+            } else break;
+        }
+
+        Date birthday;
+        while (true) {
+            try {
+                System.out.print("Введите дату рождения (Формат: dd.MM.yyyy): ");
+                String dateStr = scanner.nextLine().trim();
+                
+                // Парсим дату в формате dd.MM.yyyy
+                String[] parts = dateStr.split("\\.");
+                if (parts.length != 3) {
+                    throw new IllegalArgumentException("Неверный формат даты");
+                }
+                
+                int day = Integer.parseInt(parts[0]);
+                int month = Integer.parseInt(parts[1]);
+                int year = Integer.parseInt(parts[2]);
+                
+                // Проверяем корректность даты через LocalDate
+                java.time.LocalDate localDate = java.time.LocalDate.of(year, month, day);
+                birthday = java.sql.Date.valueOf(localDate);
+                break;
+            } catch (Exception e) {
+                System.out.println("Ошибка ввода. Дата должна быть в формате dd.MM.yyyy и быть корректной.");
+            }
+        }
+
+        Color eyeColor = null;
+        System.out.println("Доступные цвета глаз:");
+        for (Color c : Color.values()) {
+            System.out.println("- " + c);
+        }
+        while (true) {
+            System.out.print("Введите цвет глаз (пусто если null): ");
+            String eye = scanner.nextLine().trim();
+            if (eye.isEmpty()) {
+                eyeColor = null;
+                break;
+            }
+            try {
+                eyeColor = Color.valueOf(eye.toUpperCase());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Некорректный цвет глаз. Попробуйте ещё раз.");
+            }
+        }
+
+        Country nationality = null;
+        System.out.println("Доступные страны: ");
+        for (Country c : Country.values()) {
+            System.out.println("- " + c);
+        }
+        while (true) {
+            System.out.print("Введите страну (пусто если null): ");
+            String nat = scanner.nextLine().trim();
+            if (nat.isEmpty()) {
+                nationality = null;
+                break;
+            }
+            try {
+                nationality = Country.valueOf(nat.toUpperCase());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Некорректная страна. Попробуйте ещё раз.");
+            }
+        }
+
+        return new Person(name, birthday, eyeColor, nationality);
+    }
+}
