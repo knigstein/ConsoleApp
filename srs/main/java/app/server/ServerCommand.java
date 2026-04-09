@@ -13,5 +13,16 @@ import io.FileManager;
 public interface ServerCommand {
 
     CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager);
+
+    /**
+     * Возвращает {@code true}, если команда изменяет коллекцию
+     * (добавление, удаление, обновление, очистка).
+     * По умолчанию — {@code false} (команда только читает данные).
+     *
+     * @return {@code true} если требуется автосохранение после выполнения команды
+     */
+    default boolean modifiesCollection() {
+        return false;
+    }
 }
 

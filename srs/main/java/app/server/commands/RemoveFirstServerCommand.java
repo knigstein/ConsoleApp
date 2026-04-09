@@ -24,5 +24,10 @@ public class RemoveFirstServerCommand implements ServerCommand {
         String message = removed == null ? "Коллекция пуста." : "Первый элемент удалён.";
         return new CommandResponseDTO(ResponseStatus.SUCCESS, message, null);
     }
+
+    @Override
+    public boolean modifiesCollection() {
+        return true;
+    }
 }
 

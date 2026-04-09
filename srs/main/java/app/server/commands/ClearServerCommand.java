@@ -21,5 +21,10 @@ public class ClearServerCommand implements ServerCommand {
         collectionManager.clear();
         return new CommandResponseDTO(ResponseStatus.SUCCESS, "Коллекция очищена.", null);
     }
+
+    @Override
+    public boolean modifiesCollection() {
+        return true;
+    }
 }
 

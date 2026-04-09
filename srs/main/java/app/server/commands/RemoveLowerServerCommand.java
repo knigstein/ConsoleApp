@@ -29,5 +29,10 @@ public class RemoveLowerServerCommand implements ServerCommand {
         String message = "Удалено элементов: " + removed;
         return new CommandResponseDTO(ResponseStatus.SUCCESS, message, null);
     }
+
+    @Override
+    public boolean modifiesCollection() {
+        return true;
+    }
 }
 

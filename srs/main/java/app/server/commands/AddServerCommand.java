@@ -56,5 +56,10 @@ public class AddServerCommand implements ServerCommand {
         collectionManager.add(serverGroup);
         return new CommandResponseDTO(ResponseStatus.SUCCESS, "Группа добавлена на сервере.", null);
     }
+
+    @Override
+    public boolean modifiesCollection() {
+        return true;
+    }
 }
 

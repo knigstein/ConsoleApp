@@ -35,7 +35,19 @@ public class ServerCommandManager {
         if (command == null) {
             throw new IllegalArgumentException("Неизвестный тип команды: " + dto.getClass().getName());
         }
-        return command.execute(dto, collectionManager, fileManager);
+        CommandResponseDTO response = command.execute(dto, collectionManager, fileManager);
+
+        // Автосохранение после команд, изменяющих коллекцию
+        if (command.modifiesCollection()) {
+            try {
+                collectionManager.save(fileManager);
+                ServerLog.info("Коллекция автоматически сохранена после команды: {}", dto.getClass().getSimpleName());
+            } catch (Exception e) {
+                ServerLog.warn("Ошибка автосохранения: {}", e.getMessage());
+            }
+        }
+
+        return response;
     }
 }
 
