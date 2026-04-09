@@ -28,5 +28,10 @@ public class RemoveByIdServerCommand implements ServerCommand {
         String message = removed ? "Элемент удалён." : "Элемент с таким id не найден.";
         return new CommandResponseDTO(ResponseStatus.SUCCESS, message, null);
     }
+
+    @Override
+    public boolean modifiesCollection() {
+        return true;
+    }
 }
 

@@ -44,5 +44,10 @@ public class AddIfMinServerCommand implements ServerCommand {
         String message = added ? "Элемент добавлен как минимальный." : "Элемент не является минимальным, не добавлен.";
         return new CommandResponseDTO(ResponseStatus.SUCCESS, message, null);
     }
+
+    @Override
+    public boolean modifiesCollection() {
+        return true;
+    }
 }
 

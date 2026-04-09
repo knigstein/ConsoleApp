@@ -51,5 +51,10 @@ public class UpdateServerCommand implements ServerCommand {
         String message = ok ? "Элемент обновлён." : "Элемент с таким id не найден.";
         return new CommandResponseDTO(ok ? ResponseStatus.SUCCESS : ResponseStatus.ERROR, message, null);
     }
+
+    @Override
+    public boolean modifiesCollection() {
+        return true;
+    }
 }
 
