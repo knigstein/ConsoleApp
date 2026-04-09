@@ -224,12 +224,25 @@ public class StudyGroupBuilder {
         Date birthday;
         while (true) {
             try {
-                System.out.print("Введите дату рождения (Формат: 13062007): ");
-                long millis = Long.parseLong(scanner.nextLine());
-                birthday = new Date(millis);
+                System.out.print("Введите дату рождения (Формат: dd.MM.yyyy): ");
+                String dateStr = scanner.nextLine().trim();
+                
+                // Парсим дату в формате dd.MM.yyyy
+                String[] parts = dateStr.split("\\.");
+                if (parts.length != 3) {
+                    throw new IllegalArgumentException("Неверный формат даты");
+                }
+                
+                int day = Integer.parseInt(parts[0]);
+                int month = Integer.parseInt(parts[1]);
+                int year = Integer.parseInt(parts[2]);
+                
+                // Проверяем корректность даты через LocalDate
+                java.time.LocalDate localDate = java.time.LocalDate.of(year, month, day);
+                birthday = java.sql.Date.valueOf(localDate);
                 break;
             } catch (Exception e) {
-                System.out.println("Ошибка ввода");
+                System.out.println("Ошибка ввода. Дата должна быть в формате dd.MM.yyyy и быть корректной.");
             }
         }
 
@@ -238,10 +251,19 @@ public class StudyGroupBuilder {
         for (Color c : Color.values()) {
             System.out.println("- " + c);
         }
-        System.out.print("Введите цвет: ");
-        String eye = scanner.nextLine();
-        if (!eye.trim().isEmpty()) {
-            eyeColor = Color.valueOf(eye.trim());
+        while (true) {
+            System.out.print("Введите цвет глаз (пусто если null): ");
+            String eye = scanner.nextLine().trim();
+            if (eye.isEmpty()) {
+                eyeColor = null;
+                break;
+            }
+            try {
+                eyeColor = Color.valueOf(eye.toUpperCase());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Некорректный цвет глаз. Попробуйте ещё раз.");
+            }
         }
 
         Country nationality = null;
@@ -249,10 +271,19 @@ public class StudyGroupBuilder {
         for (Country c : Country.values()) {
             System.out.println("- " + c);
         }
-        System.out.print("Введите страну: ");
-        String nat = scanner.nextLine();
-        if (!nat.trim().isEmpty()) {
-            nationality = Country.valueOf(nat.trim());
+        while (true) {
+            System.out.print("Введите страну (пусто если null): ");
+            String nat = scanner.nextLine().trim();
+            if (nat.isEmpty()) {
+                nationality = null;
+                break;
+            }
+            try {
+                nationality = Country.valueOf(nat.toUpperCase());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Некорректная страна. Попробуйте ещё раз.");
+            }
         }
 
         return new Person(name, birthday, eyeColor, nationality);

@@ -5,5 +5,7 @@ package common.dto;
  * Аргументы не требуются.
  */
 public class ShowCommandDTO implements CommandDTO {
+
+    private static final long serialVersionUID = 1L;
 }
 

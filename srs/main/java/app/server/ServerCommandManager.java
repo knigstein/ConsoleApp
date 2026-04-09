@@ -3,6 +3,7 @@ package server;
 import collection.CollectionManager;
 import common.dto.CommandDTO;
 import common.dto.CommandResponseDTO;
+import io.FileManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,9 +16,11 @@ public class ServerCommandManager {
 
     private final Map<Class<? extends CommandDTO>, ServerCommand> commands = new HashMap<>();
     private final CollectionManager collectionManager;
+    private final FileManager fileManager;
 
-    public ServerCommandManager(CollectionManager collectionManager) {
+    public ServerCommandManager(CollectionManager collectionManager, FileManager fileManager) {
         this.collectionManager = collectionManager;
+        this.fileManager = fileManager;
     }
 
     public void register(Class<? extends CommandDTO> type, ServerCommand command) {
@@ -32,7 +35,7 @@ public class ServerCommandManager {
         if (command == null) {
             throw new IllegalArgumentException("Неизвестный тип команды: " + dto.getClass().getName());
         }
-        return command.execute(dto, collectionManager);
+        return command.execute(dto, collectionManager, fileManager);
     }
 }
 

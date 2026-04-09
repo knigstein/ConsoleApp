@@ -1,4 +1,5 @@
 package server.commands;
+import io.FileManager;
 
 import collection.CollectionManager;
 import common.dto.AddCommandDTO;
@@ -22,7 +23,7 @@ import java.time.LocalDate;
 public class AddServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
         if (!(dto instanceof AddCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для AddServerCommand");
         }

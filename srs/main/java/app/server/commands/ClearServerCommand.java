@@ -1,4 +1,5 @@
 package server.commands;
+import io.FileManager;
 
 import collection.CollectionManager;
 import common.dto.ClearCommandDTO;
@@ -13,7 +14,7 @@ import server.ServerCommand;
 public class ClearServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
         if (!(dto instanceof ClearCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для ClearServerCommand");
         }

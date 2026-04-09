@@ -1,4 +1,5 @@
 package server.commands;
+import io.FileManager;
 
 import collection.CollectionManager;
 import common.dto.CommandDTO;
@@ -16,7 +17,7 @@ import java.time.LocalDate;
 public class UpdateServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
         if (!(dto instanceof UpdateCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для UpdateServerCommand");
         }

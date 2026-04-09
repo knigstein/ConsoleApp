@@ -8,6 +8,8 @@ import java.io.Serializable;
  */
 public enum ResponseStatus implements Serializable {
     SUCCESS,
-    ERROR
+    ERROR;
+
+    private static final long serialVersionUID = 1L;
 }
 

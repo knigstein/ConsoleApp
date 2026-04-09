@@ -1,4 +1,5 @@
 package server.commands;
+import io.FileManager;
 
 import collection.CollectionManager;
 import common.dto.CommandDTO;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 public class FilterGreaterThanSemesterServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
         if (!(dto instanceof FilterGreaterThanSemesterCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для FilterGreaterThanSemesterServerCommand");
         }

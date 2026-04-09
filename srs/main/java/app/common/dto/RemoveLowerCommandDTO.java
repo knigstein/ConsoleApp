@@ -7,6 +7,8 @@ import model.StudyGroup;
  */
 public class RemoveLowerCommandDTO implements CommandDTO {
 
+    private static final long serialVersionUID = 1L;
+
     private final StudyGroup studyGroup;
 
     public RemoveLowerCommandDTO(StudyGroup studyGroup) {

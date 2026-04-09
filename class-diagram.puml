@@ -1,0 +1,377 @@
+@startuml Lab5_Class_Diagram
+
+' Стиль
+skinparam classAttributeIconSize 0
+skinparam classFontColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam packageBackgroundColor #f5f5f5
+
+' ===== МОДЕЛЬ =====
+package "model" {
+    class StudyGroup {
+        -id: Integer
+        -name: String
+        -coordinates: Coordinates
+        -creationDate: LocalDate
+        -studentsCount: int
+        -expelledStudents: Long
+        -transferredStudents: int
+        -semesterEnum: Semester
+        -groupAdmin: Person
+        +getId(): Integer
+        +getName(): String
+        +getCoordinates(): Coordinates
+        +getCreationDate(): LocalDate
+        +getStudentsCount(): int
+        +getExpelledStudents(): Long
+        +getTransferredStudents(): int
+        +getSemesterEnum(): Semester
+        +getGroupAdmin(): Person
+        +setId(Integer): void
+        +compareTo(StudyGroup): int
+    }
+    
+    class Coordinates {
+        -x: int
+        -y: Double
+        +getX(): int
+        +getY(): Double
+    }
+    
+    class Person {
+        -name: String
+        -birthday: Date
+        -eyeColor: Color
+        -nationality: Country
+        +getName(): String
+        +getBirthday(): Date
+        +getEyeColor(): Color
+        +getNationality(): Country
+    }
+    
+    enum Semester {
+        FIRST
+        SECOND
+        THIRD
+        FOURTH
+        FIFTH
+        SIXTH
+        SEVENTH
+        EIGHTH
+    }
+    
+    enum Color {
+        BLACK
+        BLUE
+        BROWN
+        GREEN
+        ORANGE
+        RED
+        WHITE
+    }
+    
+    enum Country {
+        CHINA
+        FRANCE
+        GERMANY
+        INDIA
+        ITALY
+        NORTH_KOREA
+        RUSSIA
+        SPAIN
+        UKRAINE
+        BELARUS
+        KAZAKHSTAN
+    }
+}
+
+' ===== КОМАНДЫ (CLIENT) =====
+package "command" {
+    interface Command {
+        +execute(String[]): void
+        +getDescription(): String
+    }
+    
+    interface ScriptAware {
+        +setScanner(Scanner): void
+    }
+    
+    class CommandManager {
+        -commands: Map<String, Command>
+        +register(String, Command): void
+        +execute(String, Scanner): boolean
+        +printHelp(): void
+    }
+    
+    class AddCommand implements Command
+    class AddIfMinCommand implements Command
+    class ClearCommand implements Command
+    class ExitCommand implements Command
+    class FilterContainsNameCommand implements Command
+    class FilterGreaterThanSemesterCommand implements Command
+    class HelpCommand implements Command
+    class InfoCommand implements Command
+    class PrintFieldDescendingGroupAdminCommand implements Command
+    class RemoveByIdCommand implements Command
+    class RemoveFirstCommand implements Command
+    class RemoveLowerCommand implements Command
+    class SaveCommand implements Command
+    class ShowCommand implements Command
+    class UpdateCommand implements Command
+    class ExecuteScriptCommand implements Command, ScriptAware
+}
+
+' ===== DTO (COMMON) =====
+package "common.dto" {
+    interface CommandDTO {
+        <<Serializable>>
+    }
+    
+    class CommandResponseDTO {
+        -status: ResponseStatus
+        -message: String
+        -collection: List<StudyGroup>
+        +getStatus(): ResponseStatus
+        +getMessage(): String
+        +getCollection(): List<StudyGroup>
+    }
+    
+    enum ResponseStatus {
+        SUCCESS
+        ERROR
+    }
+    
+    class AddCommandDTO implements CommandDTO
+    class AddIfMinCommandDTO implements CommandDTO
+    class ClearCommandDTO implements CommandDTO
+    class ExecuteScriptCommandDTO implements CommandDTO
+    class FilterContainsNameCommandDTO implements CommandDTO
+    class FilterGreaterThanSemesterCommandDTO implements CommandDTO
+    class InfoCommandDTO implements CommandDTO
+    class PrintFieldDescendingGroupAdminCommandDTO implements CommandDTO
+    class RemoveByIdCommandDTO implements CommandDTO
+    class RemoveFirstCommandDTO implements CommandDTO
+    class RemoveLowerCommandDTO implements CommandDTO
+    class ShowCommandDTO implements CommandDTO
+    class UpdateCommandDTO implements CommandDTO
+}
+
+class SerializationUtils {
+    +serialize(Object): byte[]
+}
+
+' ===== КЛИЕНТ =====
+package "client" {
+    class ClientMain {
+        -DEFAULT_PORT: int
+        -DEFAULT_HOST: String
+        -executingScripts: Set<String>
+        +main(String[]): void
+        -buildCommandDTO(String, String[], Scanner): CommandDTO
+        -buildStudyGroupInteractive(Scanner): StudyGroup
+        -handleResponse(CommandResponseDTO): void
+        -executeScript(String[], ClientNetwork, Scanner): void
+        -printHelp(): void
+    }
+    
+    class ClientNetwork {
+        -BUFFER_SIZE: int
+        -TIMEOUT_MS: int
+        -MAX_RETRIES: int
+        -channel: DatagramChannel
+        -serverAddress: SocketAddress
+        +ClientNetwork(String, int)
+        +sendAndReceive(CommandDTO): CommandResponseDTO
+        +close(): void
+    }
+}
+
+' ===== СЕРВЕР =====
+package "server" {
+    interface ServerCommand {
+        +execute(CommandDTO, CollectionManager): CommandResponseDTO
+    }
+    
+    class ServerMain {
+        -DEFAULT_PORT: int
+        -BUFFER_SIZE: int
+        +main(String[]): void
+        -registerCommands(ServerCommandManager): void
+        -handleRequest(DatagramChannel, SelectionKey, ServerCommandManager, CollectionManager): void
+        -deserializeCommand(byte[]): CommandDTO
+    }
+    
+    class ServerCommandManager {
+        -commands: Map<Class<? extends CommandDTO>, ServerCommand>
+        -collectionManager: CollectionManager
+        +register(Class<? extends CommandDTO>, ServerCommand): void
+        +handle(CommandDTO): CommandResponseDTO
+    }
+    
+    class ServerLog {
+        -log4jLogger: Object
+        -log4jInfo: Method
+        -log4jWarn: Method
+        -log4jError: Method
+        +info(String): void
+        +warn(String): void
+        +error(String): void
+        +error(String, Throwable): void
+    }
+    
+    class AddServerCommand implements ServerCommand
+    class AddIfMinServerCommand implements ServerCommand
+    class ClearServerCommand implements ServerCommand
+    class ExecuteScriptServerCommand implements ServerCommand
+    class FilterContainsNameServerCommand implements ServerCommand
+    class FilterGreaterThanSemesterServerCommand implements ServerCommand
+    class InfoServerCommand implements ServerCommand
+    class PrintFieldDescendingGroupAdminServerCommand implements ServerCommand
+    class RemoveByIdServerCommand implements ServerCommand
+    class RemoveFirstServerCommand implements ServerCommand
+    class RemoveLowerServerCommand implements ServerCommand
+    class ShowServerCommand implements ServerCommand
+    class UpdateServerCommand implements ServerCommand
+}
+
+' ===== КОЛЛЕКЦИЯ =====
+package "collection" {
+    class CollectionManager {
+        -collection: PriorityQueue<StudyGroup>
+        -initializationDate: LocalDateTime
+        +getCollection(): PriorityQueue<StudyGroup>
+        +getInitializationDate(): LocalDateTime
+        +size(): int
+        +add(StudyGroup): void
+        +clear(): void
+        +removeFirst(): StudyGroup
+        +getInfo(): String
+        +update(Integer, StudyGroup): boolean
+        +removeById(Integer): boolean
+        +save(FileManager): void
+        +updateById(Integer, StudyGroup): boolean
+        +addIfMin(StudyGroup): boolean
+        +removeLower(StudyGroup): int
+        +filterContainsName(String): void
+        +filterGreaterThanSemester(Semester): void
+        +printAdminsDescending(): void
+        +getById(Integer): StudyGroup
+        +replaceById(Integer, StudyGroup): boolean
+        +removeAndReturnById(Integer): Optional<StudyGroup>
+    }
+}
+
+' ===== IO =====
+package "io" {
+    class FileManager {
+        -filename: String
+        +FileManager(String)
+        +load(): PriorityQueue<StudyGroup>
+        +save(PriorityQueue<StudyGroup>): void
+        -convertToXml(PriorityQueue<StudyGroup>): String
+        -parseStudyGroup(Element): StudyGroup
+        -getTagValue(Element, String): String
+    }
+    
+    class InputHandler
+    class ConsoleManager
+}
+
+' ===== UTIL =====
+package "util" {
+    class IdGenerator {
+        -currentId: int
+        +generateId(): int
+        +updateCurrentId(int): void
+    }
+    
+    class StudyGroupBuilder {
+        -scanner: Scanner
+        +StudyGroupBuilder(Scanner)
+        +build(): StudyGroup
+        -readName(): String
+        -readCoordinates(): Coordinates
+        -readStudentsCount(): int
+        -readExpelledStudents(): Long
+        -readTransferredStudents(): int
+        -readSemester(): Semester
+        -readGroupAdmin(): Person
+    }
+}
+
+' ===== СВЯЗИ =====
+ClientMain --> ClientNetwork
+ClientMain --> CommandDTO
+ClientMain --> CommandResponseDTO
+ClientNetwork --> SerializationUtils
+
+ServerMain --> ServerCommandManager
+ServerMain --> CollectionManager
+ServerMain --> CommandDTO
+ServerMain --> CommandResponseDTO
+ServerMain --> SerializationUtils
+ServerMain --> ServerLog
+
+ServerCommandManager --> ServerCommand
+ServerCommandManager --> CollectionManager
+
+CollectionManager --> StudyGroup
+CollectionManager --> FileManager
+
+FileManager --> StudyGroup
+
+CommandDTO <|-- AddCommandDTO
+CommandDTO <|-- AddIfMinCommandDTO
+CommandDTO <|-- ClearCommandDTO
+CommandDTO <|-- ExecuteScriptCommandDTO
+CommandDTO <|-- FilterContainsNameCommandDTO
+CommandDTO <|-- FilterGreaterThanSemesterCommandDTO
+CommandDTO <|-- InfoCommandDTO
+CommandDTO <|-- PrintFieldDescendingGroupAdminCommandDTO
+CommandDTO <|-- RemoveByIdCommandDTO
+CommandDTO <|-- RemoveFirstCommandDTO
+CommandDTO <|-- RemoveLowerCommandDTO
+CommandDTO <|-- ShowCommandDTO
+CommandDTO <|-- UpdateCommandDTO
+
+ServerCommand <|-- AddServerCommand
+ServerCommand <|-- AddIfMinServerCommand
+ServerCommand <|-- ClearServerCommand
+ServerCommand <|-- ExecuteScriptServerCommand
+ServerCommand <|-- FilterContainsNameServerCommand
+ServerCommand <|-- FilterGreaterThanSemesterServerCommand
+ServerCommand <|-- InfoServerCommand
+ServerCommand <|-- PrintFieldDescendingGroupAdminServerCommand
+ServerCommand <|-- RemoveByIdServerCommand
+ServerCommand <|-- RemoveFirstServerCommand
+ServerCommand <|-- RemoveLowerServerCommand
+ServerCommand <|-- ShowServerCommand
+ServerCommand <|-- UpdateServerCommand
+
+Command <|-- AddCommand
+Command <|-- AddIfMinCommand
+Command <|-- ClearCommand
+Command <|-- ExitCommand
+Command <|-- FilterContainsNameCommand
+Command <|-- FilterGreaterThanSemesterCommand
+Command <|-- HelpCommand
+Command <|-- InfoCommand
+Command <|-- PrintFieldDescendingGroupAdminCommand
+Command <|-- RemoveByIdCommand
+Command <|-- RemoveFirstCommand
+Command <|-- RemoveLowerCommand
+Command <|-- SaveCommand
+Command <|-- ShowCommand
+Command <|-- UpdateCommand
+Command <|-- ExecuteScriptCommand
+
+ScriptAware <|-- ExecuteScriptCommand
+
+StudyGroup --> Coordinates
+StudyGroup --> Person
+StudyGroup --> Semester
+Person --> Color
+Person --> Country
+
+@enduml

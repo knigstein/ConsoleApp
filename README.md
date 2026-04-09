@@ -20,3 +20,40 @@ In interactive mode, the program supports executing the following commands:
     filter_contains_name name : output the elements whose name field value contains the specified substring
     filter_greater_than_semester_enum semesterEnum : output the elements whose semesterEnum field value is greater than the specified
     one print_field_descending_group_admin : output the values of the GroupAdmin field of all elements in descending order
+
+---
+
+## Client/Server (Lab 6-style requirements)
+
+This repo contains a split into **client** and **server** applications:
+
+- `server.ServerMain`: хранит коллекцию, выполняет команды, читает/пишет файл.
+- `client.ClientMain`: интерактивно читает команды, валидирует ввод, отправляет DTO на сервер по UDP и печатает ответ.
+- `common.dto.*`: объекты-команды и ответ сервера (обмен не строками, а объектами).
+- `common.SerializationUtils`: сериализация объектов для передачи по сети.
+
+### Run
+
+Сборка сделана максимально «без инструментов», через `javac` + скрипты:
+
+```bash
+./run-server.sh ./data.xml 5555
+```
+
+В другом терминале:
+
+```bash
+./run-server.sh ./data.xml 5555
+```
+
+### Notes
+
+- Команда `save` **недоступна на клиенте** (не отправляется). На сервере есть **локальная** команда `save`, вводится в консоль сервера.
+- Команда `exit` завершает клиент.
+- Сервер работает **в одном потоке**: сеть на `DatagramChannel` + `Selector` (non-blocking), локальные команды читаются через `stdin.ready()` без блокировки.
+- Коллекции, которые возвращаются клиенту (например `show`/фильтры), сервер сортирует по «местоположению» (координатам).
+
+### Logging (Log4J2)
+
+Под Log4J2 добавлен конфиг `srs/main/resources/log4j2.xml`.
+Если Log4J2 присутствует в classpath, сервер будет логировать через него; иначе используется стандартный `java.util.logging` (чтобы проект компилировался без внешних зависимостей).

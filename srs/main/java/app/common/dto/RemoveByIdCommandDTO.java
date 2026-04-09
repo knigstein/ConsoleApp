@@ -5,6 +5,8 @@ package common.dto;
  */
 public class RemoveByIdCommandDTO implements CommandDTO {
 
+    private static final long serialVersionUID = 1L;
+
     private final Integer id;
 
     public RemoveByIdCommandDTO(Integer id) {

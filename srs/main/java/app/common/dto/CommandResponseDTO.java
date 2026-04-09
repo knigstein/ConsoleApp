@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class CommandResponseDTO implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private final ResponseStatus status;
     private final String message;
     private final List<StudyGroup> collection;

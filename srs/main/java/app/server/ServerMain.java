@@ -47,8 +47,8 @@ public class ServerMain {
             ServerLog.error("Ошибка загрузки файла: {}", e.getMessage());
         }
 
-        ServerCommandManager commandManager = new ServerCommandManager(collectionManager);
-        registerCommands(commandManager);
+        ServerCommandManager commandManager = new ServerCommandManager(collectionManager, fileManager);
+        registerCommands(commandManager, fileManager);
 
         try (DatagramChannel channel = DatagramChannel.open();
              Selector selector = Selector.open()) {
@@ -110,7 +110,7 @@ public class ServerMain {
         }
     }
 
-    private static void registerCommands(ServerCommandManager manager) {
+    private static void registerCommands(ServerCommandManager manager, FileManager fileManager) {
         manager.register(InfoCommandDTO.class, new InfoServerCommand());
         manager.register(ShowCommandDTO.class, new ShowServerCommand());
         manager.register(AddCommandDTO.class, new AddServerCommand());
@@ -124,6 +124,7 @@ public class ServerMain {
         manager.register(FilterGreaterThanSemesterCommandDTO.class, new FilterGreaterThanSemesterServerCommand());
         manager.register(PrintFieldDescendingGroupAdminCommandDTO.class, new PrintFieldDescendingGroupAdminServerCommand());
         manager.register(ExecuteScriptCommandDTO.class, new ExecuteScriptServerCommand());
+        manager.register(SaveCommandDTO.class, new SaveServerCommand(fileManager));
     }
 
     private static void handleRequest(DatagramChannel channel,

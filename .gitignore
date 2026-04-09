@@ -12,3 +12,11 @@ out/
 
 # Logs
 *.log
+
+# Distribution artifacts
+dist/
+*.tar.gz
+*.jar
+
+# Local temp
+*.log

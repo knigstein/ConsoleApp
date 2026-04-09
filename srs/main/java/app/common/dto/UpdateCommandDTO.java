@@ -8,6 +8,8 @@ import model.StudyGroup;
  */
 public class UpdateCommandDTO implements CommandDTO {
 
+    private static final long serialVersionUID = 1L;
+
     private final Integer id;
     private final StudyGroup updatedGroup;
 

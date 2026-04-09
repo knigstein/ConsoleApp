@@ -16,4 +16,5 @@ public enum Semester implements Serializable {
     SEVENTH,
     EIGHTH;
 
+    private static final long serialVersionUID = 1L;
 }

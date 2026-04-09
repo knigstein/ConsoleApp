@@ -16,6 +16,9 @@ import java.time.LocalDate;
  * Класс является частью доменной модели приложения для управления коллекцией учебных групп.
  */
 public class StudyGroup implements Comparable<StudyGroup>, Serializable {
+    
+    private static final long serialVersionUID = 1L;
+    
     private Integer id;
     private String name;
     private Coordinates coordinates;
@@ -206,7 +209,7 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
 
     /**
      * Возвращает строковое представление учебной группы,
-     * содержащее основные поля объекта (id, имя, количество студентов, семестр).
+     * содержащее все поля объекта.
      *
      * @return строковое представление объекта {@code StudyGroup}
      */
@@ -215,8 +218,13 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
         return "StudyGroup{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", coordinates=" + coordinates +
+                ", creationDate=" + creationDate +
                 ", studentsCount=" + studentsCount +
+                ", expelledStudents=" + expelledStudents +
+                ", transferredStudents=" + transferredStudents +
                 ", semesterEnum=" + semesterEnum +
+                ", groupAdmin=" + groupAdmin +
                 '}';
     }
 

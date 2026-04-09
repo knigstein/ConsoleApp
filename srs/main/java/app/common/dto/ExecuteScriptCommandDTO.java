@@ -9,6 +9,8 @@ package common.dto;
  */
 public class ExecuteScriptCommandDTO implements CommandDTO {
 
+    private static final long serialVersionUID = 1L;
+
     private final String fileName;
 
     public ExecuteScriptCommandDTO(String fileName) {

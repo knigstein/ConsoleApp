@@ -1,4 +1,5 @@
 package server.commands;
+import io.FileManager;
 
 import collection.CollectionManager;
 import common.dto.CommandDTO;
@@ -14,7 +15,7 @@ import server.ServerCommand;
 public class RemoveLowerServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
         if (!(dto instanceof RemoveLowerCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для RemoveLowerServerCommand");
         }

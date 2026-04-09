@@ -5,6 +5,8 @@ package common.dto;
  */
 public class FilterContainsNameCommandDTO implements CommandDTO {
 
+    private static final long serialVersionUID = 1L;
+
     private final String substring;
 
     public FilterContainsNameCommandDTO(String substring) {

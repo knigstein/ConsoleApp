@@ -12,4 +12,5 @@ public enum Country implements Serializable {
     USA,
     SPAIN;
 
+    private static final long serialVersionUID = 1L;
 }

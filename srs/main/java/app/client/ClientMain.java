@@ -1,7 +1,6 @@
 package client;
 
 import common.dto.*;
-import input.InputHandler;
 import model.*;
 import util.StudyGroupBuilder;
 

@@ -1,4 +1,5 @@
 package server.commands;
+import io.FileManager;
 
 import collection.CollectionManager;
 import common.dto.CommandDTO;
@@ -16,7 +17,7 @@ import server.ServerCommand;
 public class ExecuteScriptServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
         return new CommandResponseDTO(
                 ResponseStatus.ERROR,
                 "Команда execute_script должна выполняться на стороне клиента, а не сервера.",
