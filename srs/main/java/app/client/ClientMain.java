@@ -21,6 +21,9 @@ public class ClientMain {
     private static final int DEFAULT_PORT = 5555;
     private static final String DEFAULT_HOST = "localhost";
 
+    private static String currentLogin = null;
+    private static String currentPassword = null;
+
     /**
      * Набор имён файлов скриптов, которые в данный момент находятся в процессе выполнения.
      * Используется для предотвращения прямой и косвенной рекурсии при вызове {@code execute_script}.
@@ -33,6 +36,11 @@ public class ClientMain {
         int port = args.length > 1 ? Integer.parseInt(args[1]) : DEFAULT_PORT;
 
         System.out.println("Клиент подключается к " + host + ":" + port);
+        System.out.println("===========================================");
+        System.out.println("ВНИМАНИЕ: Для выполнения серверных команд требуется авторизация.");
+        System.out.println("Сначала выполните: register <логин> <пароль>");
+        System.out.println("Или: login <логин> <пароль>");
+        System.out.println("===========================================");
 
         try (ClientNetwork network = new ClientNetwork(host, port);
              Scanner scanner = new Scanner(System.in)) {
@@ -65,6 +73,17 @@ public class ClientMain {
                     continue;
                 }
 
+                if ("logout".equals(cmd)) {
+                    if (currentLogin == null) {
+                        System.out.println("Вы не авторизованы.");
+                    } else {
+                        System.out.println("Вы вышли из аккаунта: " + currentLogin);
+                        currentLogin = null;
+                        currentPassword = null;
+                    }
+                    continue;
+                }
+
                 if ("execute_script".equals(cmd)) {
                     executeScript(parts, network, scanner);
                     continue;
@@ -77,7 +96,26 @@ public class ClientMain {
                         continue;
                     }
 
-                    CommandResponseDTO response = network.sendAndReceive(dto);
+                    CommandDTO toSend = dto;
+                    if (shouldAttachCredentials(dto)) {
+                        if (currentLogin == null || currentPassword == null) {
+                            System.out.println("Для этой команды нужна авторизация. Сначала выполните login или register.");
+                            continue;
+                        }
+                        toSend = CommandWithUser.wrap(dto, currentLogin, currentPassword);
+                    }
+
+                    CommandResponseDTO response = network.sendAndReceive(toSend);
+                    if (response.getStatus() == ResponseStatus.SUCCESS) {
+                        if (dto instanceof RegisterCommandDTO reg) {
+                            currentLogin = normalizeLogin(reg.getLogin());
+                            currentPassword = reg.getPassword();
+                        } else if (dto instanceof LoginCommandDTO log) {
+                            currentLogin = normalizeLogin(log.getLogin());
+                            currentPassword = log.getPassword();
+                        }
+                    }
+
                     handleResponse(response);
 
                 } catch (IOException e) {
@@ -97,6 +135,38 @@ public class ClientMain {
     private static CommandDTO buildCommandDTO(String cmd, String[] parts, Scanner scanner) {
 
         switch (cmd) {
+            case "register": {
+                if (parts.length < 3) {
+                    System.out.println("Использование: register <логин> <пароль>");
+                    return null;
+                }
+                String regLogin = normalizeLogin(parts[1]);
+                if (regLogin == null) {
+                    System.out.println("Логин не может быть пустым.");
+                    return null;
+                }
+                if (parts[2].isEmpty()) {
+                    System.out.println("Пароль не может быть пустым.");
+                    return null;
+                }
+                return new RegisterCommandDTO(regLogin, parts[2]);
+            }
+            case "login": {
+                if (parts.length < 3) {
+                    System.out.println("Использование: login <логин> <пароль>");
+                    return null;
+                }
+                String logLogin = normalizeLogin(parts[1]);
+                if (logLogin == null) {
+                    System.out.println("Логин не может быть пустым.");
+                    return null;
+                }
+                if (parts[2].isEmpty()) {
+                    System.out.println("Пароль не может быть пустым.");
+                    return null;
+                }
+                return new LoginCommandDTO(logLogin, parts[2]);
+            }
             case "info":
                 return new InfoCommandDTO();
             case "show":
@@ -184,7 +254,8 @@ public class ClientMain {
             return;
         }
 
-        System.out.println(response.getStatus() + ": " + response.getMessage());
+        String statusLabel = response.getStatus() == ResponseStatus.SUCCESS ? "Успех" : "Ошибка";
+        System.out.println(statusLabel + ": " + response.getMessage());
 
         List<StudyGroup> collection = response.getCollection();
         if (collection != null && !collection.isEmpty()) {
@@ -254,6 +325,17 @@ public class ClientMain {
                     continue;
                 }
 
+                if ("logout".equals(cmd)) {
+                    if (currentLogin == null) {
+                        System.out.println("Вы не авторизованы.");
+                    } else {
+                        System.out.println("Вы вышли из аккаунта: " + currentLogin);
+                        currentLogin = null;
+                        currentPassword = null;
+                    }
+                    continue;
+                }
+
                 if ("help".equals(cmd)) {
                     printHelp();
                     continue;
@@ -266,7 +348,26 @@ public class ClientMain {
                         continue;
                     }
 
-                    CommandResponseDTO response = network.sendAndReceive(dto);
+                    CommandDTO toSend = dto;
+                    if (shouldAttachCredentials(dto)) {
+                        if (currentLogin == null || currentPassword == null) {
+                            System.out.println("Для этой команды нужна авторизация. Сначала выполните login или register.");
+                            continue;
+                        }
+                        toSend = CommandWithUser.wrap(dto, currentLogin, currentPassword);
+                    }
+
+                    CommandResponseDTO response = network.sendAndReceive(toSend);
+                    if (response.getStatus() == ResponseStatus.SUCCESS) {
+                        if (dto instanceof RegisterCommandDTO reg) {
+                            currentLogin = normalizeLogin(reg.getLogin());
+                            currentPassword = reg.getPassword();
+                        } else if (dto instanceof LoginCommandDTO log) {
+                            currentLogin = normalizeLogin(log.getLogin());
+                            currentPassword = log.getPassword();
+                        }
+                    }
+
                     handleResponse(response);
 
                 } catch (IOException e) {
@@ -288,6 +389,9 @@ public class ClientMain {
 
     private static void printHelp() {
         System.out.println("Доступные команды клиента:");
+        System.out.println("  register <логин> <пароль>   - Регистрация нового пользователя");
+        System.out.println("  login <логин> <пароль>      - Авторизация пользователя");
+        System.out.println("  logout                       - Выйти из текущего аккаунта");
         System.out.println("  info");
         System.out.println("  show");
         System.out.println("  add");
@@ -303,6 +407,20 @@ public class ClientMain {
         System.out.println("  execute_script <filename>");
         System.out.println("  exit");
         System.out.println("Команда save доступна только на сервере и из клиента не отправляется.");
+    }
+
+    private static boolean shouldAttachCredentials(CommandDTO dto) {
+        return !(dto instanceof RegisterCommandDTO) &&
+               !(dto instanceof LoginCommandDTO) &&
+               !(dto instanceof common.dto.AuthCommandDTO);
+    }
+
+    private static String normalizeLogin(String login) {
+        if (login == null) {
+            return null;
+        }
+        String trimmed = login.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }
 

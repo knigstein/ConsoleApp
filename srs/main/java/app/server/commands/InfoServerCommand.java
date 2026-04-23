@@ -1,5 +1,5 @@
 package server.commands;
-import io.FileManager;
+import server.CommandExecutionContext;
 
 import collection.CollectionManager;
 import common.dto.CommandDTO;
@@ -8,13 +8,10 @@ import common.dto.InfoCommandDTO;
 import common.dto.ResponseStatus;
 import server.ServerCommand;
 
-/**
- * Серверная реализация команды info.
- */
 public class InfoServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, CommandExecutionContext context) {
         if (!(dto instanceof InfoCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для InfoServerCommand");
         }
@@ -22,4 +19,3 @@ public class InfoServerCommand implements ServerCommand {
         return new CommandResponseDTO(ResponseStatus.SUCCESS, info, null);
     }
 }
-

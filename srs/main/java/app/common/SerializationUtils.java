@@ -3,11 +3,8 @@ package common;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
 
-/**
- * Вспомогательные методы сериализации объектов для отправки по сети.
- * Используется как на сервере, так и на клиенте.
- */
 public final class SerializationUtils {
 
     private SerializationUtils() {
@@ -21,6 +18,11 @@ public final class SerializationUtils {
         }
 
         return baos.toByteArray();
+    }
+
+    public static ByteBuffer serializeToBuffer(Object obj) throws IOException {
+        byte[] data = serialize(obj);
+        return ByteBuffer.wrap(data);
     }
 }
 

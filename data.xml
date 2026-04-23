@@ -113,4 +113,23 @@
       <nationality>SPAIN</nationality>
     </groupAdmin>
   </studyGroup>
+  <studyGroup>
+    <id>7</id>
+    <name>oapj</name>
+    <creationDate>2026-04-18</creationDate>
+    <studentsCount>3478</studentsCount>
+    <expelledStudents>675</expelledStudents>
+    <transferredStudents>432</transferredStudents>
+    <semesterEnum></semesterEnum>
+    <coordinates>
+      <x>3247</x>
+      <y>3249.0</y>
+    </coordinates>
+    <groupAdmin>
+      <name>Romna</name>
+      <birthday>1087070400000</birthday>
+      <eyeColor></eyeColor>
+      <nationality></nationality>
+    </groupAdmin>
+  </studyGroup>
 </studyGroups>

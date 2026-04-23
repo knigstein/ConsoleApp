@@ -1,42 +1,27 @@
 package server.commands;
-import io.FileManager;
+import server.CommandExecutionContext;
 
 import collection.CollectionManager;
 import common.dto.CommandDTO;
 import common.dto.CommandResponseDTO;
 import common.dto.PrintFieldDescendingGroupAdminCommandDTO;
 import common.dto.ResponseStatus;
-import model.StudyGroup;
 import server.ServerCommand;
 
-import java.util.Comparator;
-import java.util.stream.Collectors;
+import java.util.List;
 
-/**
- * Серверная команда print_field_descending_group_admin.
- * Возвращает имена администраторов в порядке убывания в тексте сообщения.
- */
 public class PrintFieldDescendingGroupAdminServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, CommandExecutionContext context) {
         if (!(dto instanceof PrintFieldDescendingGroupAdminCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для PrintFieldDescendingGroupAdminServerCommand");
         }
 
-        String body = collectionManager.getCollection()
-                .stream()
-                .map(StudyGroup::getGroupAdmin)
-                .filter(admin -> admin != null && admin.getName() != null)
-                .map(admin -> admin.getName())
-                .sorted(Comparator.reverseOrder())
-                .collect(Collectors.joining(System.lineSeparator()));
+        List<String> admins = collectionManager.printAdminsDescending();
 
-        if (body.isEmpty()) {
-            body = "Администраторы не найдены.";
-        }
+        String body = admins.isEmpty() ? "Администраторы не найдены." : String.join(System.lineSeparator(), admins);
 
         return new CommandResponseDTO(ResponseStatus.SUCCESS, body, null);
     }
 }
-

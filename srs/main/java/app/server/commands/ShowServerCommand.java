@@ -1,5 +1,5 @@
 package server.commands;
-import io.FileManager;
+import server.CommandExecutionContext;
 
 import collection.CollectionManager;
 import common.dto.CommandDTO;
@@ -13,15 +13,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Серверная реализация команды show.
- * Возвращает коллекцию учебных групп, отсортированную по местоположению
- * (сравнение по координатам).
- */
 public class ShowServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, CommandExecutionContext context) {
         if (!(dto instanceof ShowCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для ShowServerCommand");
         }
@@ -38,4 +33,3 @@ public class ShowServerCommand implements ServerCommand {
         return new CommandResponseDTO(ResponseStatus.SUCCESS, message, sorted);
     }
 }
-

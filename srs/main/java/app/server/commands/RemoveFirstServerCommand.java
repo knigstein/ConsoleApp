@@ -1,5 +1,5 @@
 package server.commands;
-import io.FileManager;
+import server.CommandExecutionContext;
 
 import collection.CollectionManager;
 import common.dto.CommandDTO;
@@ -9,18 +9,19 @@ import common.dto.ResponseStatus;
 import model.StudyGroup;
 import server.ServerCommand;
 
-/**
- * Серверная команда remove_first.
- */
 public class RemoveFirstServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, CommandExecutionContext context) {
+        if (!context.isAuthorized()) {
+            return new CommandResponseDTO(ResponseStatus.ERROR, "Не авторизован", null);
+        }
+
         if (!(dto instanceof RemoveFirstCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для RemoveFirstServerCommand");
         }
 
-        StudyGroup removed = collectionManager.removeFirst();
+        StudyGroup removed = collectionManager.removeFirst(context.getUserId()).orElse(null);
         String message = removed == null ? "Коллекция пуста." : "Первый элемент удалён.";
         return new CommandResponseDTO(ResponseStatus.SUCCESS, message, null);
     }
@@ -30,4 +31,3 @@ public class RemoveFirstServerCommand implements ServerCommand {
         return true;
     }
 }
-

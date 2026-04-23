@@ -1,5 +1,5 @@
 package server.commands;
-import io.FileManager;
+import server.CommandExecutionContext;
 
 import collection.CollectionManager;
 import common.dto.CommandDTO;
@@ -11,13 +11,14 @@ import server.ServerCommand;
 
 import java.time.LocalDate;
 
-/**
- * Серверная команда update по id.
- */
 public class UpdateServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, CommandExecutionContext context) {
+        if (!context.isAuthorized()) {
+            return new CommandResponseDTO(ResponseStatus.ERROR, "Не авторизован", null);
+        }
+
         if (!(dto instanceof UpdateCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для UpdateServerCommand");
         }
@@ -35,6 +36,10 @@ public class UpdateServerCommand implements ServerCommand {
             return new CommandResponseDTO(ResponseStatus.ERROR, "Элемент с таким id не найден.", null);
         }
 
+        if (!context.getUserId().equals(existing.getOwnerId())) {
+            return new CommandResponseDTO(ResponseStatus.ERROR, "Нельзя изменять чужие группы", null);
+        }
+
         StudyGroup serverGroup = new StudyGroup(
                 id,
                 updatedGroup.getName(),
@@ -47,7 +52,7 @@ public class UpdateServerCommand implements ServerCommand {
                 updatedGroup.getGroupAdmin()
         );
 
-        boolean ok = collectionManager.replaceById(id, serverGroup);
+        boolean ok = collectionManager.update(id, serverGroup, context.getUserId());
         String message = ok ? "Элемент обновлён." : "Элемент с таким id не найден.";
         return new CommandResponseDTO(ok ? ResponseStatus.SUCCESS : ResponseStatus.ERROR, message, null);
     }
@@ -57,4 +62,3 @@ public class UpdateServerCommand implements ServerCommand {
         return true;
     }
 }
-

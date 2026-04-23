@@ -1,5 +1,5 @@
 package server.commands;
-import io.FileManager;
+import server.CommandExecutionContext;
 
 import collection.CollectionManager;
 import common.dto.CommandDTO;
@@ -8,13 +8,14 @@ import common.dto.RemoveByIdCommandDTO;
 import common.dto.ResponseStatus;
 import server.ServerCommand;
 
-/**
- * Серверная команда remove_by_id.
- */
 public class RemoveByIdServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, CommandExecutionContext context) {
+        if (!context.isAuthorized()) {
+            return new CommandResponseDTO(ResponseStatus.ERROR, "Не авторизован", null);
+        }
+
         if (!(dto instanceof RemoveByIdCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для RemoveByIdServerCommand");
         }
@@ -24,9 +25,9 @@ public class RemoveByIdServerCommand implements ServerCommand {
             return new CommandResponseDTO(ResponseStatus.ERROR, "id не должен быть null", null);
         }
 
-        boolean removed = collectionManager.removeById(id);
+        boolean removed = collectionManager.removeById(id, context.getUserId());
         String message = removed ? "Элемент удалён." : "Элемент с таким id не найден.";
-        return new CommandResponseDTO(ResponseStatus.SUCCESS, message, null);
+        return new CommandResponseDTO(removed ? ResponseStatus.SUCCESS : ResponseStatus.ERROR, message, null);
     }
 
     @Override
@@ -34,4 +35,3 @@ public class RemoveByIdServerCommand implements ServerCommand {
         return true;
     }
 }
-

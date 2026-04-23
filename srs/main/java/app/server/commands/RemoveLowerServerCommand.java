@@ -1,5 +1,5 @@
 package server.commands;
-import io.FileManager;
+import server.CommandExecutionContext;
 
 import collection.CollectionManager;
 import common.dto.CommandDTO;
@@ -9,13 +9,14 @@ import common.dto.ResponseStatus;
 import model.StudyGroup;
 import server.ServerCommand;
 
-/**
- * Серверная команда remove_lower.
- */
 public class RemoveLowerServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, CommandExecutionContext context) {
+        if (!context.isAuthorized()) {
+            return new CommandResponseDTO(ResponseStatus.ERROR, "Не авторизован", null);
+        }
+
         if (!(dto instanceof RemoveLowerCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для RemoveLowerServerCommand");
         }
@@ -25,7 +26,7 @@ public class RemoveLowerServerCommand implements ServerCommand {
             return new CommandResponseDTO(ResponseStatus.ERROR, "Базовый объект не задан", null);
         }
 
-        int removed = collectionManager.removeLower(base);
+        int removed = collectionManager.removeLower(base, context.getUserId());
         String message = "Удалено элементов: " + removed;
         return new CommandResponseDTO(ResponseStatus.SUCCESS, message, null);
     }
@@ -35,4 +36,3 @@ public class RemoveLowerServerCommand implements ServerCommand {
         return true;
     }
 }
-

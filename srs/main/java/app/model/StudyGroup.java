@@ -28,6 +28,7 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
     private int transferredStudents;
     private Semester semesterEnum;
     private Person groupAdmin;
+    private Integer ownerId;
 
     /**
      * Создаёт новый объект учебной группы с указанными параметрами.
@@ -53,8 +54,8 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
                       Semester semesterEnum,
                       Person groupAdmin) {
 
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("id cannot be null and must be more than 0");
+        if (id != null && id <= 0) {
+            throw new IllegalArgumentException("id must be more than 0 when specified");
         }
 
         if (name == null || name.trim().isEmpty()) {
@@ -111,7 +112,9 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
     public int compareTo(StudyGroup other) {
         int result = Integer.compare(this.studentsCount, other.studentsCount);
         if (result == 0) {
-            return Integer.compare(this.id, other.id);
+            int thisId = this.id == null ? Integer.MAX_VALUE : this.id;
+            int otherId = other.id == null ? Integer.MAX_VALUE : other.id;
+            return Integer.compare(thisId, otherId);
         }
         return result;
     }
@@ -205,6 +208,14 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
      */
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
     }
 
     /**

@@ -1,5 +1,5 @@
 package server.commands;
-import io.FileManager;
+import server.CommandExecutionContext;
 
 import collection.CollectionManager;
 import common.dto.AddIfMinCommandDTO;
@@ -8,17 +8,17 @@ import common.dto.CommandResponseDTO;
 import common.dto.ResponseStatus;
 import model.StudyGroup;
 import server.ServerCommand;
-import util.IdGenerator;
 
 import java.time.LocalDate;
 
-/**
- * Серверная команда add_if_min.
- */
 public class AddIfMinServerCommand implements ServerCommand {
 
     @Override
-    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, FileManager fileManager) {
+    public CommandResponseDTO execute(CommandDTO dto, CollectionManager collectionManager, CommandExecutionContext context) {
+        if (!context.isAuthorized()) {
+            return new CommandResponseDTO(ResponseStatus.ERROR, "Не авторизован", null);
+        }
+
         if (!(dto instanceof AddIfMinCommandDTO)) {
             throw new IllegalArgumentException("Некорректный тип DTO для AddIfMinServerCommand");
         }
@@ -29,7 +29,7 @@ public class AddIfMinServerCommand implements ServerCommand {
         }
 
         StudyGroup candidate = new StudyGroup(
-                IdGenerator.generateId(),
+                null,
                 fromClient.getName(),
                 fromClient.getCoordinates(),
                 LocalDate.now(),
@@ -40,7 +40,7 @@ public class AddIfMinServerCommand implements ServerCommand {
                 fromClient.getGroupAdmin()
         );
 
-        boolean added = collectionManager.addIfMin(candidate);
+        boolean added = collectionManager.addIfMin(candidate, context.getUserId());
         String message = added ? "Элемент добавлен как минимальный." : "Элемент не является минимальным, не добавлен.";
         return new CommandResponseDTO(ResponseStatus.SUCCESS, message, null);
     }
@@ -50,4 +50,3 @@ public class AddIfMinServerCommand implements ServerCommand {
         return true;
     }
 }
-

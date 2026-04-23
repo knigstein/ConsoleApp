@@ -36,7 +36,7 @@ echo "Creating server.jar..."
 cat > "$BUILD_DIR/MANIFEST-SERVER.MF" << EOF
 Manifest-Version: 1.0
 Main-Class: server.ServerMain
-Class-Path: lib/log4j-api-2.23.1.jar lib/log4j-core-2.23.1.jar
+Class-Path: ./lib/postgresql-42.7.0.jar
 Created-By: Lab5 Build Script
 
 EOF
@@ -46,18 +46,17 @@ echo "Creating client.jar..."
 cat > "$BUILD_DIR/MANIFEST-CLIENT.MF" << EOF
 Manifest-Version: 1.0
 Main-Class: client.ClientMain
-Class-Path: lib/log4j-api-2.23.1.jar lib/log4j-core-2.23.1.jar
+Class-Path: ./lib/postgresql-42.7.0.jar
 Created-By: Lab5 Build Script
 
 EOF
 
-# Create JAR files
-(cd "$BUILD_DIR" && jar cfm "$DIST_DIR/server.jar" MANIFEST-SERVER.MF .)
-(cd "$BUILD_DIR" && jar cfm "$DIST_DIR/client.jar" MANIFEST-CLIENT.MF .)
+# Create JAR files with full classpath
+(cd "$BUILD_DIR" && jar cfm "$DIST_DIR/server.jar" MANIFEST-SERVER.MF . && jar cfm "$DIST_DIR/client.jar" MANIFEST-CLIENT.MF .)
 echo ""
 echo "=== Build Complete ==="
 echo "Server JAR: $DIST_DIR/server.jar"
 echo "Client JAR: $DIST_DIR/client.jar"
 echo ""
-echo "To run server: java -jar dist/server.jar data.xml 5555"
-echo "To run client: java -jar dist/client.jar localhost 5555"
+echo "To run server: java -cp dist/server.jar:lib/postgresql-42.7.0.jar server.ServerMain <db_login> <db_password> [port]"
+echo "To run client: java -cp dist/client.jar:lib/postgresql-42.7.0.jar client.ClientMain localhost 5555"
