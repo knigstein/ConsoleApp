@@ -1,0 +1,19 @@
+plugins {
+    id 'java-library'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+}
+
+tasks.register('commonJar', Jar) {
+    group = 'build'
+    description = 'Build shared common jar'
+    archiveBaseName = 'common'
+    destinationDirectory = layout.buildDirectory.dir('dist')
+    from sourceSets.main.output
+}

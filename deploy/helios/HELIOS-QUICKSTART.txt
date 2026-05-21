@@ -1,0 +1,96 @@
+# Lab 5 — Helios: структура и команды (канон под текущий Gradle)
+
+## Структура (зафиксировать для всего кода)
+- Корень репозитория: LAB_5/
+- Модули: common/, client/, server/ + корневой build.gradle, settings.gradle, gradlew
+- Сборка артефактов: из корня `gradle clean build distHelios` или на стенде `deploy/helios/build.sh`
+- После distHelios: deploy/helios/dist/*.jar, deploy/helios/lib/*.jar, deploy/helios/Corpus/ (планы этажей для GUI)
+- Запуск на Helios: только из каталога deploy/helios (скрипты ждут dist/, lib/, Corpus рядом с собой)
+
+## Архив для отправки
+- Готовый файл: deploy/helios/LAB_5-helios-submission.tar.gz (и датированная копия в каталоге родителя репозитория)
+- Пересборка архива из корня LAB_5: ./scripts/package-helios-submission.sh
+- Перед упаковкой на своей машине выполните полную сборку (чтобы dist/lib были актуальны):
+    gradle clean build distHelios
+  (distHelios кладёт Corpus в deploy/helios/Corpus — нужно для карты этажей)
+
+## Передача на Helios
+  scp deploy/helios/LAB_5-helios-submission.tar.gz <login>@helios:~/
+
+## Распаковка на Helios
+  cd ~
+  tar -xzf LAB_5-helios-submission.tar.gz
+  cd ~/labuba8/LAB_5/deploy/helios
+  chmod +x build.sh run-server.sh run-server-bg.sh run-client.sh run-gui-client.sh helios-stack.sh init-db.sh
+
+## Сборка
+  На своей Linux-машине (Arch): gradle clean build distHelios  или  ./lab5 build
+  На Helios (Java 17): только проверка готовых JAR, не полный Gradle:
+  cd ~/LAB_5/deploy/helios
+  ./build.sh verify
+  (если dist/server.jar уже есть — ./build.sh просто проверит и выйдет)
+
+## Первый запуск БД (при необходимости)
+  cd ~/LAB_5/deploy/helios
+  ./init-db.sh <db_login>
+
+## Сервер (передний план)
+  cd ~/LAB_5/deploy/helios
+  ./run-server.sh <db_login> 5555
+
+  Необязательно — другой хост/порт/имя БД:
+  export LAB5_DB_HOST=pg LAB5_DB_PORT=5432 LAB5_DB_NAME=studs
+  ./run-server.sh <db_login> 5555
+
+## Важно: GUI на Helios (FreeBSD) и GUI на Arch
+
+JavaFX **не запускается на Helios (FreeBSD)** — ошибка `FreeBSD is not supported`.
+
+Рабочая схема:
+- **Helios:** только сервер + БД (`./lab5 server-bg`)
+- **Arch (ваш ПК): GUI через SSH-туннель UDP к Helios
+
+## Канон Helios: сервер
+  ssh -Y <login>@helios.se.ifmo.ru
+  cd ~/labuba8/LAB_5
+  ./lab5 check
+  ./lab5 server-bg <db_login> 5555
+
+  (то же из deploy/helios: ./check-env.sh && ./helios-stack.sh all <db_login> 5555)
+
+  Отдельно: только фоновый сервер — ./helios-stack.sh server-bg <db_login> 5555
+  Только GUI к локальному серверу — ./helios-stack.sh gui 5555
+  Остановка фона — ./helios-stack.sh stop
+
+## Консольный клиент (на Helios, к серверу localhost)
+  cd ~/LAB_5/deploy/helios
+  ./run-client.sh localhost 5555
+
+## GUI на Arch (синхронизация с Helios/БД) — рекомендуется
+
+Helios: только сервер
+  cd ~/labuba8/LAB_5
+  ./lab5 server-bg <db_login> 5555
+
+Arch (одна команда — Java-мост + GUI):
+  cd /path/to/LAB_5
+  ./lab5 remote-gui <login>@helios.cs.ifmo.ru <db_login> 5555 5555
+
+Вручную (два шага):
+  ./scripts/udp-tunnel-helios.sh start <login>@helios.cs.ifmo.ru
+  ./lab5 mock 127.0.0.1 5555
+  ./scripts/udp-tunnel-helios.sh stop
+
+Важно: ssh -L 5555:... пробрасывает только TCP; Lab 5 использует UDP.
+
+./lab5 mock — реальный режим (сервер/БД), не демо.
+Демо без сервера: ./lab5 mock-ui
+
+Для tunnel-режима переменная должна быть в кавычках:
+  export LAB5_REMOTE_DEPLOY='~/labuba8/LAB_5/deploy/helios'
+
+## Локальная разработка (из корня LAB_5)
+  gradle clean build
+  gradle runServer -PappArgs="<db_login> 5555"
+  gradle runClient -PappArgs="localhost 5555"
+  ./run-gui-client.sh real localhost 5555

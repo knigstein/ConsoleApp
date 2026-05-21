@@ -1,101 +1,142 @@
-# Lab 5 Deployment Guide for FreeBSD (helios)
+# Lab 5 Deployment Guide (Helios + local GUI)
+
+## Target topology
+
+- Helios runs PostgreSQL-backed UDP server.
+- Helios can run console client for diagnostics.
+- **Recommended:** JavaFX GUI also runs on Helios with `ssh -Y`, talking to `localhost` (avoids blocked inbound UDP from the internet).
+- Optional: run GUI on a laptop and point it at Helios (often fails if UDP is filtered).
 
 ## Requirements
 
-- **Java 17+** — check with `java -version`
-  - On FreeBSD: `pkg install openjdk17` or `openjdk21`
-- **Bash** — usually pre-installed on FreeBSD
+- Java 17+ (`java -version`)
+- Bash
+- `unzip` (needed only when wrapper fallback is used)
+- Optional system `gradle` (preferred on Helios to avoid wrapper downloads)
 
-## Quick Start
+## Important upload rule
 
-### 1. Upload to helios
+Deploy scripts resolve paths relative to repository root. Upload the whole project tree, not only `deploy/helios/*`.
 
 ```bash
-scp -r deploy/helios/* your_login@helios:~/lab5/
+scp -r LAB_5 <login>@helios:~/
 ```
 
-Or upload the archive:
+Or archive the full project and extract to any directory that keeps the original root structure.
+
+## Build (recommended: on Arch/Linux, not on Helios)
+
+**Helios has Java 17 only** — run prebuilt JARs. Full Gradle build needs OpenJFX and is unreliable on FreeBSD.
+
+On **Arch** (from repository root):
 
 ```bash
-scp lab5-deploy-helios.tar.gz your_login@helios:~/
-ssh your_login@helios
-mkdir -p lab5 && cd lab5
-tar xzf ~/lab5-deploy-helios.tar.gz
+./lab5 build
+# or: ./scripts/deploy-helios.sh   # build + scp server.jar to Helios
 ```
 
-### 2. Build on helios
+On **Helios** — verify artifacts only (after upload or `deploy-helios.sh`):
 
 ```bash
-cd ~/lab5
-chmod +x build.sh run-server.sh run-client.sh
-./build.sh
+cd ~/LAB_5/deploy/helios
+chmod +x build.sh run-server.sh run-server-bg.sh run-client.sh helios-stack.sh init-db.sh
+./build.sh verify
+# or server-only: ./build.sh server
 ```
 
-### 3. Run the Server
+If `dist/server*.jar` is already present, `./build.sh` skips Gradle automatically on FreeBSD.
+
+Do **not** expect `./build.sh` to compile from sources on Helios unless you set `LAB5_FORCE_HELIOS_BUILD=1` (usually fails on JavaFX).
+
+## Start server on Helios
 
 ```bash
-./run-server.sh data.xml 5555
+cd ~/LAB_5/deploy/helios
+./run-server.sh <db_login> 5555
 ```
 
-The server will:
-- Load the collection from `data.xml`
-- Listen on UDP port `5555`
-- Accept client connections
-- Local commands: type `save` or `exit` in the server console
+- DB URL by default is `jdbc:postgresql://pg:5432/studs`.
+- You can override DB endpoint via env vars before launch:
+  - `LAB5_DB_HOST`
+  - `LAB5_DB_PORT`
+  - `LAB5_DB_NAME`
+- `db_login` is required.
+- Port defaults to `5555` if omitted.
 
-### 4. Run the Client (another terminal)
+If this is the first deployment (or you need full schema reset), initialize DB manually:
 
 ```bash
+cd ~/LAB_5/deploy/helios
+chmod +x init-db.sh
+./init-db.sh <db_login>
+```
+
+## Start console client on Helios (optional)
+
+```bash
+cd ~/LAB_5/deploy/helios
 ./run-client.sh localhost 5555
 ```
 
-Or from another machine:
+This client is intended for quick diagnostics only.
+
+## Canonical Helios: server + GUI on the same host (recommended)
+
+UDP from the public internet to Helios is often blocked; run the JavaFX GUI **on Helios** and forward the display (X11):
 
 ```bash
-./run-client.sh <helios_hostname> 5555
+ssh -Y <login>@helios.se.ifmo.ru
+cd ~/LAB_5/deploy/helios
+./helios-stack.sh all <db_login> 5555
 ```
 
-## Available Client Commands
+This starts the server in the background, then the GUI connecting to `localhost`. Floor images are shipped under `deploy/helios/Corpus/` by `distHelios`.
 
-| Command | Description |
-|---------|-------------|
-| `help` | Show available commands |
-| `info` | Show collection info |
-| `show` | Display all elements |
-| `add` | Add new element |
-| `update <id>` | Update element by ID |
-| `remove_by_id <id>` | Remove element by ID |
-| `remove_first` | Remove first element |
-| `clear` | Clear collection |
-| `add_if_min` | Add if smaller than smallest |
-| `remove_lower` | Remove all smaller than given |
-| `filter_contains_name <substring>` | Filter by name |
-| `filter_greater_than_semester_enum <SEMESTER>` | Filter by semester |
-| `print_field_descending_group_admin` | Print group admins descending |
-| `execute_script <file>` | Run script file |
-| `exit` | Exit client |
+- Stop background server: `./helios-stack.sh stop`
+- Status: `./helios-stack.sh status`
 
-## Server-Only Commands
+## GUI from your laptop (optional; UDP may be blocked)
 
-- `save` — save collection to XML (type in server console)
-- `exit` — shutdown server (saves collection first)
+From project root (Gradle launcher):
 
-## Notes for FreeBSD
+```bash
+./run-gui-client.sh real <helios_host> 5555
+```
 
-- UDP ports > 1024 don't require root
-- If firewall is enabled: check with `sudo pfctl -s rules`
-- Java home on FreeBSD: `/usr/local/openjdk17/`
+Mock UI without server:
+
+```bash
+./run-gui-client.sh mock
+```
+
+From deploy directory (JavaFX module-path):
+
+```bash
+cd ~/LAB_5/deploy/helios
+./run-gui-client.sh real <helios_host> 5555
+```
+
+## End-to-end verification checklist
+
+1. Register user in GUI.
+2. Login in GUI.
+3. Add/update/remove object in GUI.
+4. Verify object appears/disappears in map and table.
+5. Re-open collection (`show` in console client or wait polling) and ensure state is consistent.
+
+## Notes
+
+- GUI is expected to run on local Linux/Windows/macOS. Running JavaFX on Helios (FreeBSD) is not a required path.
+- `execute_script` in GUI input is intentionally rejected by server command handler.
+- Server does not support XML `save` flow in DB mode.
 
 ## Troubleshooting
 
-**"Unable to access jarfile"** — run `./build.sh` first
-
-**"Address already in use"** — another process uses the port, try different port:
-```bash
-./run-server.sh data.xml 5556
-```
-
-**"Command not found: java"** — install OpenJDK:
-```bash
-pkg install openjdk17
-```
+- `Project directory is not part of the build`:
+  run scripts from `~/LAB_5/deploy/helios` and keep repository layout intact.
+- `curl SSL_connect` during wrapper download:
+  install/use system `gradle` on Helios.
+- `dist/server.jar not found`:
+  run `./build.sh` first.
+- `Address already in use`:
+  start server with another port, e.g. `./run-server.sh <db_login> 5556`.

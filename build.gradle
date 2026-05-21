@@ -1,0 +1,111 @@
+plugins {
+    id 'base'
+}
+
+group = 'itmo.lab5'
+version = '1.0.0'
+
+ext {
+    javafxVersion = '21.0.5'
+    javafxModules = ['javafx.base', 'javafx.graphics', 'javafx.controls']
+    javafxPlatform = {
+        String os = System.getProperty('os.name', '').toLowerCase(java.util.Locale.ENGLISH)
+        if (os.contains('windows')) return 'win'
+        if (os.contains('mac')) {
+            String arch = System.getProperty('os.arch', '').toLowerCase(java.util.Locale.ENGLISH)
+            return (arch.contains('aarch64') || arch.contains('arm64')) ? 'mac-aarch64' : 'mac'
+        }
+        if (os.contains('linux')) return 'linux'
+        if (os.contains('freebsd')) return 'linux'
+        return 'linux'
+    }.call()
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = 17
+    }
+}
+
+tasks.register('copyRuntimeLibs', Copy) {
+    group = 'build'
+    description = 'Copy runtime dependencies to build/dist/lib'
+    dependsOn ':server:jar', ':client:jar'
+    from(project(':server').configurations.runtimeClasspath)
+    from(project(':client').configurations.runtimeClasspath)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    into layout.buildDirectory.dir('dist/lib')
+}
+
+tasks.register('collectJars', Copy) {
+    group = 'build'
+    description = 'Collect common/server/client jars into build/dist'
+    dependsOn ':common:commonJar', ':server:serverJar', ':client:clientJar', ':client:guiClientJar'
+    from(project(':common').layout.buildDirectory.dir('dist')) {
+        include '*.jar'
+    }
+    from(project(':server').layout.buildDirectory.dir('dist')) {
+        include '*.jar'
+    }
+    from(project(':client').layout.buildDirectory.dir('dist')) {
+        include '*.jar'
+    }
+    into layout.buildDirectory.dir('dist')
+}
+
+tasks.register('runServer', JavaExec) {
+    group = 'application'
+    description = 'Run server.ServerMain with args: <db_login> [port]'
+    classpath = project(':server').sourceSets.main.runtimeClasspath
+    mainClass = 'server.ServerMain'
+    standardInput = System.in
+    if (project.hasProperty('appArgs')) {
+        args project.property('appArgs').toString().split('\\s+').findAll { !it.isBlank() }
+    }
+}
+
+tasks.register('runClient', JavaExec) {
+    group = 'application'
+    description = 'Run client.ClientMain with args: <host> <port>'
+    classpath = project(':client').sourceSets.main.runtimeClasspath
+    mainClass = 'client.ClientMain'
+    standardInput = System.in
+    if (project.hasProperty('appArgs')) {
+        args project.property('appArgs').toString().split('\\s+').findAll { !it.isBlank() }
+    }
+}
+
+tasks.register('distHelios', Copy) {
+    group = 'distribution'
+    description = 'Prepare deploy/helios with gradle-built artifacts and Corpus for GUI maps'
+    dependsOn 'collectJars', 'copyRuntimeLibs'
+    from(layout.buildDirectory.dir('dist')) {
+        include '*.jar'
+        into 'dist'
+    }
+    from(layout.buildDirectory.dir('dist/lib')) {
+        into 'lib'
+    }
+    from(layout.projectDirectory.dir('Corpus')) {
+        into 'Corpus'
+    }
+    into layout.projectDirectory.dir('deploy/helios')
+}
+
+tasks.named('build') {
+    dependsOn ':common:build', ':client:build', ':server:build', 'collectJars', 'copyRuntimeLibs'
+}

@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# Единая команда запуска Lab 5 (корень репозитория).
+#   ./lab5 build              — сборка + distHelios
+#   ./lab5 check [server]     — проверка deploy/helios (server = только UDP-сервер)
+#   ./lab5 start <db_login> [port] — сервер (фон) + GUI (нужен DISPLAY / ssh -p 2222 -Y)
+#       db_login = логин PostgreSQL (s456129), НЕ имя хоста helios.cs.ifmo.ru
+#   ./lab5 gui [port]         — только GUI к localhost (сервер уже запущен)
+#   ./lab5 mock [host] [port] — GUI, синхронизированный с сервером/БД (реальный режим)
+#   ./lab5 mock-ui            — старый демо-режим без сервера
+#   ./lab5 remote-gui <user>@helios.cs.ifmo.ru <db_login> — GUI на Linux через SSH-туннель
+#   ./lab5 server <db_login> [port] — только сервер (передний план)
+#   ./lab5 stop               — остановить фоновый сервер
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+DEPLOY="$ROOT/deploy/helios"
+
+if [[ ! -d "$DEPLOY" ]]; then
+  echo "Не найден $DEPLOY"
+  exit 1
+fi
+
+CMD="${1:-help}"
+shift || true
+
+case "$CMD" in
+  build)
+    exec "$DEPLOY/build.sh"
+    ;;
+  check)
+    exec "$DEPLOY/check-env.sh" "${1:-}"
+    ;;
+  start|all)
+    DB_LOGIN="${1:-$USER}"
+    PORT="${2:-5555}"
+    exec "$DEPLOY/helios-stack.sh" all "$DB_LOGIN" "$PORT"
+    ;;
+  gui)
+    PORT="${1:-5555}"
+    exec "$DEPLOY/helios-stack.sh" gui "$PORT"
+    ;;
+  mock)
+    HOST="${1:-localhost}"
+    PORT="${2:-5555}"
+    exec "$DEPLOY/run-gui-client.sh" real "$HOST" "$PORT"
+    ;;
+  remote-gui)
+    REMOTE="${1:-}"
+    DB_LOGIN="${2:-}"
+    LOCAL_PORT="${3:-5555}"
+    REMOTE_PORT="${4:-5555}"
+    if [[ -z "$REMOTE" || -z "$DB_LOGIN" ]]; then
+      echo "Использование: ./lab5 remote-gui <user>@helios.cs.ifmo.ru <db_login> [local_port] [remote_port]"
+      exit 1
+    fi
+    exec "$ROOT/scripts/run-gui-via-tunnel.sh" "$REMOTE" "$DB_LOGIN" "$LOCAL_PORT" "$REMOTE_PORT"
+    ;;
+  mock-ui)
+    exec "$DEPLOY/run-gui-client.sh" mock
+    ;;
+  server)
+    exec "$DEPLOY/helios-stack.sh" server-fg "$@"
+    ;;
+  server-bg)
+    exec "$DEPLOY/helios-stack.sh" server-bg "$@"
+    ;;
+  stop)
+    exec "$DEPLOY/helios-stack.sh" stop
+    ;;
+  status)
+    exec "$DEPLOY/helios-stack.sh" status
+    ;;
+  client)
+    exec "$DEPLOY/run-client.sh" "$@"
+    ;;
+  help|-h|--help)
+    sed -n '1,20p' "$0" | rg '^# ' | sed 's/^# \{0,1\}//'
+    ;;
+  *)
+    echo "Неизвестная команда: $CMD (./lab5 help)"
+    exit 1
+    ;;
+esac

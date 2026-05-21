@@ -1,0 +1,38 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation project(':common')
+    implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
+    implementation 'org.postgresql:postgresql:42.7.4'
+}
+
+application {
+    mainClass = 'server.ServerMain'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+}
+
+tasks.register('serverJar', Jar) {
+    group = 'build'
+    description = 'Build executable server jar'
+    archiveBaseName = 'server'
+    destinationDirectory = layout.buildDirectory.dir('dist')
+    from sourceSets.main.output
+    from project(':common').sourceSets.main.output
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes('Main-Class': 'server.ServerMain')
+    }
+}

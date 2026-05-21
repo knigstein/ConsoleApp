@@ -27,23 +27,36 @@ In interactive mode, the program supports executing the following commands:
 
 This repo contains a split into **client** and **server** applications:
 
-- `server.ServerMain`: хранит коллекцию, выполняет команды, читает/пишет файл.
+- `server.ServerMain`: коллекция в PostgreSQL, команды по UDP, аргументы: `<db_login> [port]`.
 - `client.ClientMain`: интерактивно читает команды, валидирует ввод, отправляет DTO на сервер по UDP и печатает ответ.
 - `common.dto.*`: объекты-команды и ответ сервера (обмен не строками, а объектами).
 - `common.SerializationUtils`: сериализация объектов для передачи по сети.
 
 ### Run
 
-Сборка сделана максимально «без инструментов», через `javac` + скрипты:
+Сборка и запуск выполняются через **Gradle Wrapper**:
 
 ```bash
-./run-server.sh ./data.xml 5555
+chmod +x ./gradlew
+./gradlew clean build
+```
+
+Запуск сервера:
+
+```bash
+./gradlew runServer -PappArgs="<db_login> 5555"
 ```
 
 В другом терминале:
 
 ```bash
-./run-server.sh ./data.xml 5555
+./gradlew runClient -PappArgs="localhost 5555"
+```
+
+Сборка готовых артефактов:
+
+```bash
+./gradlew serverJar clientJar guiClientJar copyRuntimeLibs
 ```
 
 ### Notes
@@ -55,5 +68,15 @@ This repo contains a split into **client** and **server** applications:
 
 ### Logging (Log4J2)
 
-Под Log4J2 добавлен конфиг `srs/main/resources/log4j2.xml`.
+Под Log4J2 добавлен конфиг `server/src/main/resources/log4j2.xml` (и аналогичный в `client/`).
 Если Log4J2 присутствует в classpath, сервер будет логировать через него; иначе используется стандартный `java.util.logging` (чтобы проект компилировался без внешних зависимостей).
+
+## Gradle Tasks
+
+- `./gradlew clean build` — компиляция и стандартная сборка
+- `./gradlew serverJar` — серверный исполняемый jar
+- `./gradlew clientJar` — консольный клиентский jar
+- `./gradlew guiClientJar` — GUI-клиентский jar
+- `./gradlew runServer -PappArgs=\"<db_login> 5555\"` — запуск сервера
+- `./gradlew runClient -PappArgs=\"localhost 5555\"` — запуск клиента
+- `./gradlew distHelios` — подготовка `deploy/helios/dist` и `deploy/helios/lib`

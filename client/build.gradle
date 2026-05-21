@@ -1,0 +1,91 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation project(':common')
+    implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
+    implementation group: 'org.openjfx', name: 'javafx-base', version: rootProject.ext.javafxVersion, classifier: rootProject.ext.javafxPlatform
+    implementation group: 'org.openjfx', name: 'javafx-graphics', version: rootProject.ext.javafxVersion, classifier: rootProject.ext.javafxPlatform
+    implementation group: 'org.openjfx', name: 'javafx-controls', version: rootProject.ext.javafxVersion, classifier: rootProject.ext.javafxPlatform
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+application {
+    mainClass = 'client.ClientMain'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+}
+
+processResources {
+    from("${rootProject.projectDir}/Corpus") {
+        into 'Corpus'
+    }
+}
+
+tasks.register('clientJar', Jar) {
+    group = 'build'
+    description = 'Build executable client jar'
+    archiveBaseName = 'client'
+    destinationDirectory = layout.buildDirectory.dir('dist')
+    from sourceSets.main.output
+    from project(':common').sourceSets.main.output
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes('Main-Class': 'client.ClientMain')
+    }
+}
+
+tasks.register('guiClientJar', Jar) {
+    group = 'build'
+    description = 'Build executable GUI client jar'
+    archiveBaseName = 'gui-client'
+    destinationDirectory = layout.buildDirectory.dir('dist')
+    dependsOn classes
+    from sourceSets.main.output
+    from project(':common').sourceSets.main.output
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes('Main-Class': 'client.gui.GuiClientApp')
+    }
+}
+
+tasks.register('runGuiClient', JavaExec) {
+    group = 'application'
+    description = 'Run JavaFX GUI client (client.gui.GuiClientApp). Args: [--mock] OR <host> <port>'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'client.gui.GuiClientApp'
+    standardInput = System.in
+    doFirst {
+        def fxJars = configurations.runtimeClasspath.files.findAll { it.name.startsWith('javafx-') }
+        if (fxJars.isEmpty()) {
+            throw new GradleException("JavaFX runtime jars were not resolved. Check network/dependencies for OpenJFX artifacts.")
+        }
+        def deployRoot = rootProject.layout.projectDirectory.dir('deploy/helios').asFile.exists()
+                ? rootProject.layout.projectDirectory.dir('deploy/helios').asFile.absolutePath
+                : rootProject.layout.projectDirectory.asFile.absolutePath
+        jvmArgs(
+                "-Dlab5.deploy.root=${deployRoot}",
+                '--module-path', fxJars.collect { it.absolutePath }.join(File.pathSeparator),
+                '--add-modules', rootProject.ext.javafxModules.join(',')
+        )
+    }
+    if (project.hasProperty('appArgs')) {
+        args project.property('appArgs').toString().split('\\s+').findAll { !it.isBlank() }
+    }
+}
